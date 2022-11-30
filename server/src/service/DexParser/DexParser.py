@@ -1,3 +1,4 @@
+import pprint
 from struct import *
 import leb128
 import sys
@@ -44,7 +45,7 @@ class DexPaser:
         fp.close()
         return res
 
-    def getStringIndexes(self) -> list:
+    def getStringIds(self) -> list:
         STRING_ID_ITEM_SIZE = 4
 
         fp = self.getfp('rb')
@@ -60,17 +61,19 @@ class DexPaser:
         fp.seek(stringIdsOff)
 
         for _ in range(stringIdsSize):
-            stringIdsOffs.append(unpack("<I", fp.read(STRING_ID_ITEM_SIZE))[0])
+            stringIdsOffs.append({"string_data_off":unpack("<I", fp.read(STRING_ID_ITEM_SIZE))[0]})
 
         fp.close()
         return stringIdsOffs
 
-    def getStringDataes(self) -> list:
+    def getStringFull(self) -> list:
         res = list()
-        stringIndexes = self.getStringIndexes()
+        stringIds = self.getStringIds()
         fp = self.getfp('rb')
 
-        for off in stringIndexes:
+        for idx in stringIds:
+            off = idx["string_data_off"]
+
             fp.seek(off)
             # 스트링의 크기를 나타내는 데이터의 크기 
             LEB128Size = getSizeOfLEB128(fp, off)
@@ -80,7 +83,7 @@ class DexPaser:
             stringSize = leb128.u.decode(stringSize)
 
 
-            res.append(unpack(str(stringSize)+"s", fp.read(stringSize))[0].decode("utf-8"))
+            res.append({"string_data_full" : unpack(str(stringSize)+"s", fp.read(stringSize))[0].decode("utf-8")})
         
         fp.close()
 
@@ -92,7 +95,6 @@ class DexPaser:
         res = list()
 
         headers = self.getHeader()
-        stringDataes = self.getStringDataes()
 
         typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
         typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
@@ -107,17 +109,17 @@ class DexPaser:
         for _ in range(typeIdsSize):
             typeIdItem = fp.read(TYPE_ID_ITEM_SIZE)
             typeIdItem = unpack("<I", typeIdItem)[0]
-            res.append(typeIdItem)
+            res.append({"descriptor_idx": typeIdItem})
         
         return res
 
-    def getTypeStringDataes(self)->list:
+    def getTypeFull(self)->list:
         TYPE_ID_ITEM_SIZE = 4
 
         res = list()
 
         headers = self.getHeader()
-        stringDataes = self.getStringDataes()
+        stringFull = self.getStringFull()
 
         typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
         typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
@@ -134,19 +136,91 @@ class DexPaser:
         for _ in range(typeIdsSize):
             typeIdItem = fp.read(TYPE_ID_ITEM_SIZE)
             typeIdItem = unpack("<I", typeIdItem)[0]
-            res.append(stringDataes[typeIdItem])
+            res.append({"descriptor_full":stringFull[typeIdItem]})
         
+        fp.close()
+
         return res
 
-    def getProtoes(self):
+    def getProtoIds(self)->list:
         headers = self.getHeader()
-        stringDataes = self.getStringDataes()
-        typeIds = self.getTypeIds()
 
-        typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
-        typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
+        res = list()
 
+        protoIdsSize = unpack("<I", headers["proto_ids_size"])[0]
+        protoIdsOff = unpack("<I", headers["proto_ids_off"])[0]
+
+        if protoIdsOff == 0:
+            return res
+
+        fp = self.getfp('rb')
+
+        fp.seek(protoIdsOff)
+
+        for _ in range(protoIdsSize):
+            fieldIdItem = dict()
+            fieldIdItem["shorty_idx"] = unpack("<I", fp.read(4))[0]
+            fieldIdItem["return_type_idx"] = unpack("<I", fp.read(4))[0]
+            fieldIdItem["parameters_off"] = unpack("<I", fp.read(4))[0]
+            res.append(fieldIdItem)
+
+        fp. close()
+
+        return res
+
+    def getTypeListIds(self, fp, off:int)->list:
+        res = list()
+
+        fp.seek(off)
+
+        size = unpack("<I", fp.read(4))[0]
         
+        for _ in range(size):
+            res.append(unpack("<H", fp.read(2))[0])
+        
+        fp.seek(off)
+        return res
+
+    def getTypeListFull(self, fp, off:int)->list:
+        res = list()
+
+        typeIds = self.getTypeIds()
+        stringFull = self.getStringFull()
+
+        fp.seek(off)
+
+        size = unpack("<I", fp.read(4))[0]
+        
+        for _ in range(size):
+            typeIdx = unpack("<H", fp.read(2))[0]
+            print(typeIdx)
+            # stringIdx = typeIds[typeIdx]["descriptor_idx"]
+            # string = stringFull[stringIdx]["string_data_full"]
+            # res.append(string)
+        
+        fp.seek(off)
+        return res
+        
+    
+    def getProtoFull(self)->list:
+        stringFull = self.getStringFull()
+        typeIds = self.getTypeIds()
+        protoIds = self.getProtoIds()
+
+        fp = self.getfp('rb')
+        
+        for proto in protoIds:
+            print(proto["shorty_idx"])
+            proto["shorty_idx"] = stringFull[proto["shorty_idx"]]["string_data_full"]
+            proto["return_type_idx"] = stringFull[typeIds[proto["return_type_idx"]]["descriptor_idx"]]["string_data_full"]
+            fp.seek(proto["parameters_off"])
+            proto["parameters_off"] = self.getTypeListFull(fp, proto["parameters_off"])
+            pass
+        res = protoIds
+        pprint.pprint(res)
+
+        fp.close()
+        return res
 
     def getClasses(self):
 
@@ -159,3 +233,4 @@ class DexPaser:
 
         fp = self.getfp('rb')
         fp.seek(0)
+        fp.close()
