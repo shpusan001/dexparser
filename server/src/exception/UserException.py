@@ -1,0 +1,2 @@
+class UserUtilException(Exception):
+    pass
