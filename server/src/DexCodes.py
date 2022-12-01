@@ -1,4 +1,4 @@
-opcode = {
+OPCODE = {
     0x00: 'nop',
     0x01: 'move',
     0x02: 'move/from16',
@@ -273,7 +273,7 @@ opcode = {
 }
 
 # type code list
-typecode = {
+TYPE_CODE = {
     0x0000: 'TYPE_HEADER_ITEM',
     0x0001: 'TYPE_STRING_ID_ITEM',
     0x0002: 'TYPE_TYPE_ID_ITEM',
@@ -294,7 +294,7 @@ typecode = {
     0x2006: 'TYPE_ANNOTATIONS_DIRECTORY_ITEM'
 }
 
-accessFlag = {
+ACCESS_FLAG = {
     0x1: 'public',
     0x2: 'private',
     0x4: 'protected',
@@ -315,7 +315,7 @@ accessFlag = {
     0x20000: 'synchronized'
 }
 
-accessFlagClasses = {
+ACCESS_FLAG_CLASSES = {
     0x1:    'public',
     0x2:    'private',
     0x4:    'protected',
@@ -328,7 +328,7 @@ accessFlagClasses = {
     0x4000: 'enum',
 }
 
-accessFlagFields = {
+ACCESS_FLAG_FIELDS = {
     0x1:    'public',
     0x2:    'private',
     0x4:    'protected',
@@ -340,7 +340,7 @@ accessFlagFields = {
     0x4000: 'enum',
 }
 
-accessFlagMethods = {
+ACCESS_FLAG_METHODS = {
     0x1:     'public',
     0x2:     'private',
     0x4:     'protected',
@@ -377,7 +377,7 @@ ACCESS_ORDER = [
     0x20000
 ]
 
-fieldDescriptor = {
+FIELD_DISCRIPTOR = {
     'V': 'void',
     'B': 'byte',
     'C': 'char',
@@ -390,7 +390,7 @@ fieldDescriptor = {
     '[': 'array',
 }
 
-typeDescriptor = {
+TYPE_DESCRIPTOR = {
     'V': 'void',
     'Z': 'boolean',
     'B': 'byte',
@@ -404,14 +404,14 @@ typeDescriptor = {
     '[': 'array'
 }
 
-visibility_values = {
+VISIBILITY_VALUES = {
     0x00: 'VISIBILITY_BUILD',
     0x01: 'VISIBILITY_RUNTIME',
     0x02: 'VISIBILITY_SYSTEM'
 }
 
 
-valueTypes = {
+VALUE_TYPE = {
     0x00: 'VALUE_BYTE',
     0x02: 'VALUE_SHORT',
     0x03: 'VALUE_CHAR',

@@ -1,3 +1,4 @@
+import leb128
 from struct import *
 
 from src.exception.UserException import UserUtilException
@@ -32,4 +33,13 @@ def getSizeOfLEB128(fp, off:int)->int:
     fp.seek(off)
 
     return size
-    
+
+def readLEB128ToInt(fp, off:int)->int:
+
+    fp.seek(off)
+    # 크기를 나타내는 데이터의 크기 
+    LEB128Size = getSizeOfLEB128(fp, off)
+
+    res = unpack(str(LEB128Size) + "s", fp.read(LEB128Size))[0]
+    res = leb128.u.decode(res)
+    return res
