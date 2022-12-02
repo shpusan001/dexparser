@@ -318,4 +318,10 @@ psd
 thumb
 sketch
 
+# user
+result.txt
+*.dex
+*.apk
+
+
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python
