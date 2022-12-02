@@ -12,12 +12,12 @@ class TestInit(unittest.TestCase):
         return super().setUp()
 
 
-class DexParserTest_getHeader(TestInit):
-    def test_runs(self):
-        dexPaser = DexPaser()
-        dexPaser.setFile("./src/res/", "classes.dex")
-        res = dexPaser.getHeader()
-
+# class DexParserTest_getHeader(TestInit):
+#     def test_runs(self):
+#         dexPaser = DexPaser()
+#         dexPaser.setFile("./src/res/", "classes.dex")
+#         res = dexPaser.getHeader()
+#         pprint.pprint(res)
         # self.assertDictEqual(res, {})
 
 
@@ -27,7 +27,7 @@ class DexParserTest_getHeader(TestInit):
 #         dexPaser.setFile("./src/res/", "classes.dex")
 #         res = dexPaser.getStringFull()
 
-
+#         pprint.pprint(res)
 #         # self.assertDictEqual(res, {})
 
 # class DexParserTest_getTypeFull(TestInit):
@@ -53,12 +53,14 @@ class DexParserTest_getHeader(TestInit):
 #         dexPaser = DexPaser()
 #         dexPaser.setFile("./src/res/", "classes.dex")
 #         res = dexPaser.getFieldFull()
+#         pprint.pprint(res)
 
 # class DexParserTest_getMethodFull(TestInit):
 #     def test_runs(self):
 #         dexPaser = DexPaser()
 #         dexPaser.setFile("./src/res/", "classes.dex")
 #         res = dexPaser.getMethodFull()
+#         print(res)
 
 class DexParserTest_getClassFull(TestInit):
     def test_runs(self):

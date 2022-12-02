@@ -7,12 +7,16 @@ sys.path.append('.')
 from src.util.LEB128Util import *
 from src.DexCodes import *
 
+NO_INDEX = 4294967295
 
 class DexPaser:
     def __init__(self) -> None:
         self.dirpath = None
         self.filepath = None
+        self.header = None
         self.stringFull = None
+        self.typeIds = None
+        self.protoIds = None
 
     def setFile(self, dirpath: str, filename: str) -> None:
         self.dirpath = dirpath
@@ -24,6 +28,9 @@ class DexPaser:
     # 덱스 헤더를 파싱하고 dict로 반환한다
     # 헤더 아이템 정의 : https://source.android.com/docs/core/dalvik/dex-format?hl=ko#header-item
     def getHeader(self) -> dict:
+        
+        if self.header != None:
+            return self.header
 
         # format: (name, readsize)
         headerNames = [
@@ -86,8 +93,7 @@ class DexPaser:
             stringSize = unpack(str(LEB128Size) + "s", fp.read(LEB128Size))[0]
             stringSize = leb128.u.decode(stringSize)
 
-
-            res.append({"string_data_full" : unpack(str(stringSize)+"s", fp.read(stringSize))[0].decode("utf-8")})
+            res.append({"string_data_full" : unpack(str(stringSize)+"s", fp.read(stringSize))[0].decode('latin_1')})
         
         fp.close()
         
@@ -96,6 +102,10 @@ class DexPaser:
         return res
 
     def getTypeIds(self)->list:
+
+        if self.typeIds != None:
+            return self.typeIds
+
         TYPE_ID_ITEM_SIZE = 4
 
         res = list()
@@ -149,6 +159,10 @@ class DexPaser:
         return res
 
     def getProtoIds(self)->list:
+
+        if self.protoIds != None:
+            return self.protoIds
+
         headers = self.getHeader()
 
         res = list()
@@ -377,8 +391,6 @@ class DexPaser:
                 res[i]["field_idx_diff"] = fieldFull[tmp]
             else:
                 tmp += res[i]["field_idx_diff"]
-                if tmp >= len(fieldFull):
-                    break
                 res[i]["field_idx_diff"] = fieldFull[tmp]
 
 
@@ -436,8 +448,15 @@ class DexPaser:
             else:
                 clazz["interfaces_off"] = self.getTypeListFull(fp,clazz["interfaces_off"])
             
-            clazz["source_file_idx"] = self.converStringIdxToString(clazz["source_file_idx"], stringFull)
-            clazz["class_data_off"] = self.getClassDataItem(fp, clazz["class_data_off"], classDataPack)
+            if clazz["source_file_idx"] != NO_INDEX:
+                clazz["source_file_idx"] = self.converStringIdxToString(clazz["source_file_idx"], stringFull)
+            else:
+                clazz["source_file_idx"] = "NOT_EXIST"
+
+            if clazz["class_data_off"] != 0:
+                clazz["class_data_off"] = self.getClassDataItem(fp, clazz["class_data_off"], classDataPack)
+            else:
+                clazz["class_data_off"] = "NOT_EXIST_CLASSDATA"
             
 
 
