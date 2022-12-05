@@ -13,8 +13,12 @@ NO_INDEX = 4294967295
 
 class DexPaser:
     def __init__(self) -> None:
+        self.path = None
         self.dirpath = None
         self.filepath = None
+
+        self.pathType = "ONE" # ONE or TWO
+
         self.header = None
         self.stringFull = None
         self.typeIds = None
@@ -22,12 +26,22 @@ class DexPaser:
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
 
+    def setFileFullPath(self, path):
+        self.pathType = "ONE"
+        self.path = path
+
     def setFile(self, dirpath: str, filename: str) -> None:
+        self.pathType = "TWO"
         self.dirpath = dirpath
         self.filename = filename
 
     def getfp(self, mode: str):
-        return open(self.dirpath + self.filename, mode)
+        if self.pathType == "ONE":
+            return open(self.path, mode)
+        elif self.pathType == "TWO":
+            return open(self.dirpath + self.filename, mode)
+        else:
+            raise Exception("pathType is only ONE or TWO")
 
     # 덱스 헤더를 파싱하고 dict로 반환한다
     # 헤더 아이템 정의 : https://source.android.com/docs/core/dalvik/dex-format?hl=ko#header-item
@@ -527,9 +541,9 @@ class DexPaser:
         res["insns_size"] = unpack("<I", fp.read(4))[0]
 
 
-        tmp = bytes()
+        tmp = str()
         for i in range(res["insns_size"]):
-            tmp = tmp + (fp.read(2))
+            tmp = tmp + fp.read(2).hex()
 
         res["insns"] = tmp
 

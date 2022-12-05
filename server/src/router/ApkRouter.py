@@ -14,3 +14,7 @@ async def uploadApk(res:dict = Depends(fileManageService.uploadApk)):
 @router.delete("/apk")
 async def deleteApk(res:dict = Depends(fileManageService.deleteApk)):
     return res
+
+@router.get("/apk")
+async def getApks(res:dict = Depends(fileManageService.getApks)):
+    return res

@@ -5,36 +5,50 @@ import pickle
 
 from src.repository.UploadFileMetaRepo import UploadFileMetaRepo
 from src.util.Singleton import Singleton
+from src.util.HashDigester import HashDigester
 
 class FileManageService(Singleton):
 
     def __init__(self) -> None:
         self.APK_DIR = "./apk"
-        self.UploadFileMetaRepo = UploadFileMetaRepo()
+        self.uploadFileMetaRepo = UploadFileMetaRepo()
+        self.hashDigester = HashDigester()
+
+        if not os.path.isdir(self.APK_DIR):
+            os.mkdir("./apk")
 
 
-    async def uploadApk(self, file:UploadFile):
+    async def uploadApk(self, file:UploadFile)->dict:
 
         fileId= str(uuid.uuid4())
 
         content = await file.read()
         filename = f"{fileId}.apk"
 
-        with open(os.path.join(self.APK_DIR, filename), "wb") as fp:
+        fileWritePath = os.path.join(self.APK_DIR, filename)
+        with open(fileWritePath, "wb") as fp:
             fp.write(content)  
 
-        fileMeta = {"filename":filename, "fileId":fileId}
-        self.UploadFileMetaRepo.addUploadFileMeta(fileId, fileMeta)
+        fileHash = self.hashDigester.sha1ForLageFile(fileWritePath)
 
-        return {"filename": filename, "uuid": fileId}
+        fileMeta = {"fileName":file.filename, "fileId":fileId, "sha1": fileHash}
+        self.uploadFileMetaRepo.addUploadFileMeta(fileId, fileMeta)
+
+        return {"fileName": filename, "uuid": fileId}
     
-    async def deleteApk(self, fileId:str):
+    async def deleteApk(self, fileId:str)->dict:
 
         filename = f"{fileId}.apk"
 
-        if not self.UploadFileMetaRepo.removeUploadFileMeta(fileId):
+        if not self.uploadFileMetaRepo.removeUploadFileMeta(fileId):
             return {"isError": "True", "errorMessage": "삭제하려는 파일이 존재하지 않습니다."}
         
         os.remove(os.path.join(self.APK_DIR, filename))
 
-        return {"filename": filename, "uuid": fileId, "isError": "False"}
+        return {"fileName": filename, "uuid": fileId, "isError": "False"}
+
+    async def getApks(self)->dict:
+        files = self.uploadFileMetaRepo.getFiles()
+        res = {"files": files}
+        return res
+

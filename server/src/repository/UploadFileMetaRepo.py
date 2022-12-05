@@ -26,7 +26,24 @@ class UploadFileMetaRepo(Singleton):
             return True
         return False
 
+    def getFiles(self)->list:
+        self.__loadUploadFiles()
+
+        res = list()
+
+        files = self.uploadFiles.items()
+        for value in files:
+            res.append(value[1])
+        return res
+    
+    def getFileName(self, fileId:str):
+        return self.uploadFiles[fileId]["fileName"]
+
 
     def __saveUploadFiles(self):
         with open(self.DIR,'wb') as fp:
             pickle.dump(self.uploadFiles,fp)
+
+    def __loadUploadFiles(self):
+        with open(self.DIR,'rb') as fp:
+                self.uploadFiles = pickle.load(fp)
