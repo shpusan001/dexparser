@@ -238,14 +238,18 @@ class DexPaser:
         
         for proto in protoIds:
            
-            proto["shorty_idx"] =  self.converStringIdxToString(proto["shorty_idx"], stringFull)
+            proto["shorty"] =  self.converStringIdxToString(proto["shorty_idx"], stringFull)
 
-            proto["return_type_idx"] = self.convertTypeIdxToString(proto["return_type_idx"], stringFull, typeIds)
+            proto["return_type"] = self.convertTypeIdxToString(proto["return_type_idx"], stringFull, typeIds)
 
             if proto["parameters_off"] == 0:
-                proto["parameters_off"] = []
+                proto["parameters"] = []
             else:
-                proto["parameters_off"] = self.getTypeListFull(fp,proto["parameters_off"])
+                proto["parameters"] = self.getTypeListFull(fp,proto["parameters_off"])
+
+            del proto["shorty_idx"]
+            del proto["return_type_idx"]
+            del proto["parameters_off"]
 
         res = protoIds
 
@@ -287,10 +291,11 @@ class DexPaser:
         fieldIds =  self.getFieldIds()
 
         for field in fieldIds:
-            field["class_idx"] = self.convertTypeIdxToString(field["class_idx"], stringFull, typeIds)
-            field["type_idx"] = self.convertTypeIdxToString(field["type_idx"], stringFull, typeIds)
-            field["name_idx"] = self.converStringIdxToString(field["name_idx"], stringFull)
-            res.append(field)
+            fieldFull = dict()
+            fieldFull["class"] = self.convertTypeIdxToString(field["class_idx"], stringFull, typeIds)
+            fieldFull["type"] = self.convertTypeIdxToString(field["type_idx"], stringFull, typeIds)
+            fieldFull["name"] = self.converStringIdxToString(field["name_idx"], stringFull)
+            res.append(fieldFull)
 
         return res
 
@@ -329,10 +334,11 @@ class DexPaser:
         methodIds =  self.getMethodIds()
 
         for method in methodIds:
-            method["class_idx"] = self.convertTypeIdxToString(method["class_idx"], stringFull, typeIds)
-            method["proto_idx"] = protoFull[method["proto_idx"]]
-            method["name_idx"] = self.converStringIdxToString(method["name_idx"], stringFull)
-            res.append(method)
+            methodFull = dict()
+            methodFull["class"] = self.convertTypeIdxToString(method["class_idx"], stringFull, typeIds)
+            methodFull["proto"] = protoFull[method["proto_idx"]]
+            methodFull["name"] = self.converStringIdxToString(method["name_idx"], stringFull)
+            res.append(methodFull)
 
         return res
 
@@ -398,13 +404,15 @@ class DexPaser:
         for i in range(len(res)):
             if i == 0:
                 tmp = res[i]["field_idx_diff"]
-                res[i]["field_idx_diff"] = fieldFull[tmp]
+                res[i]["field"] = fieldFull[tmp]
             else:
                 tmp += res[i]["field_idx_diff"]
-                res[i]["field_idx_diff"] = fieldFull[tmp]
+                res[i]["field"] = fieldFull[tmp]
 
 
             res[i]["access_flags"] = self.convertAccessFlagToString(res[i]["access_flags"], ACCESS_FLAG)
+
+            del res[i]["field_idx_diff"]
         
         return res
 
@@ -429,14 +437,16 @@ class DexPaser:
         for i in range(len(res)):
             if i == 0:
                 tmp = res[i]["field_idx_diff"]
-                res[i]["field_idx_diff"] = fieldFull[tmp]
+                res[i]["field"] = fieldFull[tmp]
             else:
                 tmp += res[i]["field_idx_diff"]
-                res[i]["field_idx_diff"] = fieldFull[tmp]
+                res[i]["field"] = fieldFull[tmp]
 
 
             res[i]["access_flags"] = self.convertAccessFlagToString(res[i]["access_flags"], ACCESS_FLAG)
-        
+
+            del res[i]["field_idx_diff"]
+
         return res
     
     def getTryItem(self, fp, off:int)->dict:
@@ -560,17 +570,22 @@ class DexPaser:
         for i in range(len(res)):
             if i == 0:
                 tmp = res[i]["method_idx_diff"]
-                res[i]["method_idx_diff"] = methodFull[tmp]
+                res[i]["method"] = methodFull[tmp]
             else:
                 tmp += res[i]["method_idx_diff"]
-                res[i]["method_idx_diff"] = methodFull[tmp]
+                res[i]["method"] = methodFull[tmp]
 
 
             res[i]["access_flags"] = self.convertAccessFlagToString(res[i]["access_flags"], ACCESS_FLAG)
             if res[i]["code_off"] != 0:
-                res[i]["code_off"] = self.getCodeItem(fp, res[i]["code_off"])
+                res[i]["code"] = self.getCodeItem(fp, res[i]["code_off"])
             else:
-                res[i]["code_off"] = dict()
+                res[i]["code"] = dict()
+
+            del res[i]["method_idx_diff"]
+            del res[i]["access_flags"]
+            del res[i]["code_off"]
+
             fp.seek(off)
 
         return res
@@ -597,18 +612,24 @@ class DexPaser:
         for i in range(len(res)):
             if i == 0:
                 tmp = res[i]["method_idx_diff"]
-                res[i]["method_idx_diff"] = methodFull[tmp]
+                res[i]["method"] = methodFull[tmp]
             else:
                 tmp += res[i]["method_idx_diff"]
-                res[i]["method_idx_diff"] = methodFull[tmp]
+                res[i]["method"] = methodFull[tmp]
 
 
             res[i]["access_flags"] = self.convertAccessFlagToString(res[i]["access_flags"], ACCESS_FLAG)
             if res[i]["code_off"] != 0:
-                res[i]["code_off"] = self.getCodeItem(fp, res[i]["code_off"])
+                res[i]["code"] = self.getCodeItem(fp, res[i]["code_off"])
             else:
-                res[i]["code_off"] = dict()
-        
+                res[i]["code"] = dict()
+
+            del res[i]["method_idx_diff"]
+            del res[i]["access_flags"]
+            del res[i]["code_off"]
+
+            fp.seek(off)
+
         return res
 
     def getClassDataItem(self, fp, off:int, dataPack:dict):
@@ -654,26 +675,27 @@ class DexPaser:
         fp = self.getfp("rb")
 
         for clazz in classIds:
-            clazz["class_idx"] = self.convertTypeIdxToString(clazz["class_idx"], stringFull, typeIds)
-            clazz["access_flags"] = self.convertAccessFlagToString(clazz["access_flags"], ACCESS_FLAG)
-            clazz["superclass_idx"] = self.convertTypeIdxToString(clazz["superclass_idx"], stringFull, typeIds)
+            clazzFull = dict()
+            clazzFull["class"] = self.convertTypeIdxToString(clazz["class_idx"], stringFull, typeIds)
+            clazzFull["access_flags"] = self.convertAccessFlagToString(clazz["access_flags"], ACCESS_FLAG)
+            clazzFull["superclass"] = self.convertTypeIdxToString(clazz["superclass_idx"], stringFull, typeIds)
 
             if clazz["interfaces_off"] == 0:
-                clazz["interfaces_off"] = []
+                clazzFull["interfaces"] = []
             else:
-                clazz["interfaces_off"] = self.getTypeListFull(fp,clazz["interfaces_off"])
+                clazzFull["interfaces"] = self.getTypeListFull(fp,clazz["interfaces_off"])
             
             if clazz["source_file_idx"] != NO_INDEX:
-                clazz["source_file_idx"] = self.converStringIdxToString(clazz["source_file_idx"], stringFull)
+                clazzFull["source_file"] = self.converStringIdxToString(clazz["source_file_idx"], stringFull)
             else:
-                clazz["source_file_idx"] = "NOT_EXIST"
+                clazzFull["source_file"] = "NOT_EXIST"
 
             if clazz["class_data_off"] != 0:
-                clazz["class_data_off"] = self.getClassDataItem(fp, clazz["class_data_off"], classDataPack)
+                clazzFull["class_data"] = self.getClassDataItem(fp, clazz["class_data_off"], classDataPack)
             else:
-                clazz["class_data_off"] = "NOT_EXIST_CLASSDATA"
+                clazzFull["class_data"] = "NOT_EXIST_CLASSDATA"
             
-            res.append(clazz)
+            res.append(clazzFull)
 
         fp.close()
 
