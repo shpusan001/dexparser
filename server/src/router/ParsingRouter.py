@@ -2,12 +2,13 @@ import sys
 from fastapi import APIRouter
 
 
-from src.service.DexParser.DexParser import DexPaser
+from src.util.DexParser import DexPaser
 
 
 router = APIRouter()
 
 
-@router.get("/")
-async def home():
+@router.get("/parsing")
+async def parse(fileId:str):
+
     return {"msg": "hello world"}
