@@ -1,4 +1,4 @@
-import ApkListItem from "../component/ApkListItem";
+import ApkListItem from "./ApkListItem";
 
 export default function ApkList() {
   return (

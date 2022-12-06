@@ -1,7 +1,7 @@
-import Header from "../module/Header";
-import ApkList from "../module/ApkList";
-import ApkUploadForm from "../module/ApkUploadForm";
-import ApkRemoveForm from "../module/ApkRemoveForm";
+import Header from "../component/Header";
+import ApkList from "../component/ApkList";
+import ApkUploadForm from "../component/ApkUploadForm";
+import ApkRemoveForm from "../component/ApkRemoveForm";
 
 export default function ApkListPage() {
   return (
