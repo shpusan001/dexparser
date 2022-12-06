@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ApkListItem from "./ApkListItem";
 import { useSelector, useDispatch } from "react-redux";
 import { getApkList } from "../module/apk";
@@ -8,15 +8,31 @@ export default function ApkList() {
   const dispatch = useDispatch();
   let apkList = useSelector((state) => state.apk.apkList);
 
+  let [fileList, setFileList] = useState([]);
+
   useEffect(() => {
     dispatch(getApkList());
   }, []);
 
+  useEffect(() => {
+    if (apkList.files != null) {
+      setFileList(
+        apkList.files.map((e, i) => (
+          <ApkListItem
+            key={i}
+            fileName={e.fileName}
+            fileId={e.fileId}
+            sha1={e.sha1}
+          />
+        ))
+      );
+    }
+  }, [apkList]);
+
   return (
     <>
       <h2 class="justify-content-center">APK List</h2>
-      {apkList}
-      <ApkListItem fileName="냐옹" fileId="냐냐옹" />
+      {fileList}
     </>
   );
 }

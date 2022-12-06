@@ -28,7 +28,7 @@ export function* apkSaga() {
 }
 
 const initialState = {
-  apkList: null,
+  apkList: { files: null },
   upload: null,
   delete: null,
   error: null,
@@ -38,7 +38,7 @@ const apkList = handleActions(
   {
     [GET_APKLIST_SUCCESS]: (state, { payload: data }) => ({
       ...state,
-      apklist: data,
+      apkList: data,
       error: null,
     }),
     [GET_APKLIST_FAILURE]: (state, { payload: error }) => ({

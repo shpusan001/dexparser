@@ -4,8 +4,9 @@ import dexInfo from "./dexInfo";
 import { apkSaga } from "./apk";
 import { dexInfoSaga } from "./dexInfo";
 import { all } from "redux-saga/effects";
+import loading from "./loading";
 
-const rootReducer = combineReducers({ apk, dexInfo });
+const rootReducer = combineReducers({ apk, dexInfo, loading });
 
 export function* rootSaga() {
   yield all([apkSaga(), dexInfoSaga()]);
