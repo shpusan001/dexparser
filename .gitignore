@@ -322,6 +322,9 @@ result.txt
 *.dex
 *.apk
 *.dict
+work/
+apk/
+dex/
 
 
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python

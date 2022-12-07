@@ -36,11 +36,16 @@ class DexService(Singleton):
         apkFile.close()
 
         # 읽기 권한이 없는 폴더 삭제
-        shutil.rmtree(self.WORK_DIR + "/r")
-        shutil.rmtree(self.WORK_DIR + "/kotlin")
-        shutil.rmtree(self.WORK_DIR + "/META-INF")
-        shutil.rmtree(self.WORK_DIR + "/lib")
-        shutil.rmtree(self.WORK_DIR + "/assets")
+        # removeList = ["/r", "/kotlin", "/META-INF", "/lib",
+        #               "/assets", "/res", "okhttp3", "dmaplibres"]
+        # for rm in removeList:
+        #     if os.path.isdir(self.WORK_DIR + rm):
+        #         shutil.rmtree(self.WORK_DIR + rm)
+
+        # 디렉토리들 모두 삭제
+        for file in os.scandir(self.WORK_DIR):
+            if file.is_dir():
+                shutil.rmtree(file.path)
 
         # dex파일만 뽑음
         fileList = os.listdir(self.WORK_DIR)
