@@ -1,7 +1,11 @@
 export default function ApkListItem(props) {
+  const onClick = () => {
+    navigator.clipboard.writeText(props.fileId);
+  };
+
   return (
     <>
-      <div class="mb-2 list-group w-auto">
+      <div class="mb-2 list-group w-auto" onClick={onClick}>
         <div class=" list-group-item list-group-item-action d-flex gap-3 py-3 d-flex gap-2 w-100 justify-content-between">
           <div>
             <h6 class="mb-1">{props.fileName}</h6>

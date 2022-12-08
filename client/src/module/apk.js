@@ -6,15 +6,15 @@ import * as apkAPI from "../lib/api/apk";
 import { takeLatest } from "redux-saga/effects";
 
 const [GET_APKLIST, GET_APKLIST_SUCCESS, GET_APKLIST_FAILURE] =
-  createRequestActionTypes("apk/GET_APKLIST");
+  createRequestActionTypes("apk_GET_APKLIST");
 const [UPLOAD_APK, UPLOAD_APK_SUCCESS, UPLOAD_APK_FAILURE] =
-  createRequestActionTypes("apk/CHANGE_ACCOUNT");
+  createRequestActionTypes("apk_UPLOAD_APK");
 const [DELETE_APK, DELETE_APK_SUCCESS, DELETE_APK_FAILURE] =
-  createRequestActionTypes("apk/DELETE_APK");
+  createRequestActionTypes("apk_DELETE_APK");
 
 export const getApkList = createAction(GET_APKLIST, (data) => data);
 export const uploadApk = createAction(UPLOAD_APK, (data) => data);
-export const deleteApk = createAction(UPLOAD_APK, (data) => data);
+export const deleteApk = createAction(DELETE_APK, (data) => data);
 
 //사가 생성
 const getApkListSaga = createRequestSaga(GET_APKLIST, apkAPI.getAPIList);
