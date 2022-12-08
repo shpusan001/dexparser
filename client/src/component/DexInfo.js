@@ -18,18 +18,29 @@ export default function DexInfo() {
 
     const results = parsedData.results;
 
+    const classList = [];
+
     for (let i = 0; i < results.length; i++) {
       const dexFile = results[i];
+      classList.push(
+        <DexListItem info={{ name: dexFile.fileName, type: "file" }} />
+      );
+      const data = dexFile.data;
+      for (let j = 0; j < data.length; j++) {
+        classList.push(
+          <DexListItem info={{ name: data[j].class, type: "class" }} />
+        );
+      }
     }
+
+    return classList;
   };
 
   return (
     <>
       <div class="row">
         {loading.dexInfo_GET_PARSING && <div>로딩 중</div>}
-        <div class="col me-2 bg-primary">
-          <DexListItem info={{ type: "type", name: "name" }} />
-        </div>
+        <div class="col me-2 bg-primary">{renderClassList()}</div>
         <div class="col m2-2">
           <CodeBox />
         </div>
