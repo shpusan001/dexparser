@@ -34,7 +34,7 @@ const initialState = {
   error: null,
 };
 
-const apkList = handleActions(
+const apk = handleActions(
   {
     [GET_APKLIST_SUCCESS]: (state, { payload: data }) => ({
       ...state,
@@ -60,13 +60,11 @@ const apkList = handleActions(
         error: error,
       };
     },
-    [DELETE_APK_SUCCESS]: (state, { payload: data }) => {
-      return {
-        ...state,
-        delete: data,
-        error: null,
-      };
-    },
+    [DELETE_APK_SUCCESS]: (state, { payload: data }) => ({
+      ...state,
+      delete: data,
+      error: null,
+    }),
     [DELETE_APK_FAILURE]: (state, { payload: error }) => {
       return {
         ...state,
@@ -78,4 +76,4 @@ const apkList = handleActions(
   initialState
 );
 
-export default apkList;
+export default apk;

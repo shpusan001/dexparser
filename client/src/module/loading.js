@@ -17,7 +17,9 @@ export const finishLoading = createAction(
   (requestType) => requestType
 );
 
-const initialState = {};
+const initialState = {
+  dexInfo_GET_PARSING: false,
+};
 
 const loading = handleActions(
   {

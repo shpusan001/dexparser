@@ -1,12 +1,12 @@
 import { combineReducers } from "redux";
-import apk from "./apk";
-import dexInfo from "./dexInfo";
+import dexInfo from "./dex";
 import { apkSaga } from "./apk";
-import { dexInfoSaga } from "./dexInfo";
+import { dexInfoSaga } from "./dex";
 import { all } from "redux-saga/effects";
 import loading from "./loading";
+import apk from "./apk";
 
-const rootReducer = combineReducers({ apk, dexInfo, loading });
+const rootReducer = combineReducers({ loading, apk, dexInfo });
 
 export function* rootSaga() {
   yield all([apkSaga(), dexInfoSaga()]);

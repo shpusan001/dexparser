@@ -2,30 +2,33 @@ import { createAction, handleActions } from "redux-actions";
 import createRequestSaga, {
   createRequestActionTypes,
 } from "../lib/createRequestSaga";
-import * as apkAPI from "../lib/api/apk";
+import * as dexAPI from "../lib/api/dex";
 import { takeLatest } from "redux-saga/effects";
 
 const [GET_PARSING, GET_PARSING_SUCCESS, GET_PARSING_FAILURE] =
-  createRequestActionTypes("dexInfo/GET_PARSING");
+  createRequestActionTypes("dexInfo_GET_PARSING");
 const [
   GET_CONV_HEX2SMALI,
   GET_CONV_HEX2SMALI_SUCCESS,
   GET_CONV_HEX2SMALI_FAILURE,
-] = createRequestActionTypes("dexInfo/GET_CONV_HEX2SMALI");
+] = createRequestActionTypes("dexInfo_GET_CONV_HEX2SMALI");
 
-export const getApkList = createAction(GET_PARSING, (data) => data);
-export const uploadApk = createAction(GET_CONV_HEX2SMALI, (data) => data);
+export const getParsing = createAction(GET_PARSING, (data) => data);
+export const getConvHex2Smali = createAction(
+  GET_CONV_HEX2SMALI,
+  (data) => data
+);
 
 //사가 생성
-const getApkListSaga = createRequestSaga(GET_PARSING, apkAPI.getAPIList);
-const uploadApkSaga = createRequestSaga(
+const getParsingSaga = createRequestSaga(GET_PARSING, dexAPI.getParsing);
+const getConvHex2SmaliSaga = createRequestSaga(
   GET_CONV_HEX2SMALI,
-  apkAPI.uploadApkFile
+  dexAPI.getSmali
 );
 
 export function* dexInfoSaga() {
-  yield takeLatest(GET_PARSING, getApkListSaga);
-  yield takeLatest(GET_CONV_HEX2SMALI, uploadApkSaga);
+  yield takeLatest(GET_PARSING, getParsingSaga);
+  yield takeLatest(GET_CONV_HEX2SMALI, getConvHex2SmaliSaga);
 }
 
 const initialState = {
@@ -34,7 +37,7 @@ const initialState = {
   error: null,
 };
 
-const apkList = handleActions(
+const dexInfo = handleActions(
   {
     [GET_PARSING_SUCCESS]: (state, { payload: data }) => ({
       ...state,
@@ -64,4 +67,4 @@ const apkList = handleActions(
   initialState
 );
 
-export default apkList;
+export default dexInfo;

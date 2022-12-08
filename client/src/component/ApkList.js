@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import ApkListItem from "./ApkListItem";
 import { useSelector, useDispatch } from "react-redux";
 import { getApkList } from "../module/apk";
-import client from "../lib/api/client";
 
 export default function ApkList(props) {
   const dispatch = useDispatch();
@@ -20,9 +19,9 @@ export default function ApkList(props) {
   }, [apkList]);
 
   useEffect(() => {
-    // dispatch(getApkList());
-    console.log(loading);
-  }, [loading]);
+    dispatch(getApkList());
+    console.log(loading.apk_UPLOAD_APK);
+  }, [loading.apk_UPLOAD_APK, loading.apk_DELETE_APK]);
 
   const refresh = () => {
     dispatch(getApkList());
