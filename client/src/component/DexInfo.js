@@ -130,7 +130,7 @@ export default function DexInfo() {
   };
 
   return (
-    <div class="h-100 ">
+    <div class="h-100">
       {loading.dexInfo_GET_PARSING && (
         <div class="container">
           <div class="spinner-border text-primary" role="status"></div>
