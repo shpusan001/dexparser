@@ -28,7 +28,7 @@ export function* apkSaga() {
 }
 
 const initialState = {
-  apkList: { files: null },
+  apkList: null,
   upload: null,
   delete: null,
   error: null,

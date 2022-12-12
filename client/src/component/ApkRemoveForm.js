@@ -11,8 +11,12 @@ export default function ApkRemoveForm() {
   };
 
   const onSubmit = (e) => {
-    dispatch(deleteApk({ fileId: fileId }));
     e.preventDefault();
+    new Promise((resolve, reject) => {
+      resolve(dispatch(deleteApk({ fileId: fileId })))
+    }).then(()=>{
+      setFileId("")
+    })
   };
   return (
     <>
@@ -25,6 +29,7 @@ export default function ApkRemoveForm() {
               class="form-control"
               placeholder="File ID"
               onChange={onChangeFileId}
+              value={fileId}
             />
           </div>
         </div>

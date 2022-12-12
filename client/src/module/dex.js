@@ -1,4 +1,4 @@
-import { createAction, handleActions } from "redux-actions";
+import { createAction, createActions, handleActions } from "redux-actions";
 import createRequestSaga, {
   createRequestActionTypes,
 } from "../lib/createRequestSaga";
@@ -13,9 +13,15 @@ const [
   GET_CONV_HEX2SMALI_FAILURE,
 ] = createRequestActionTypes("dexInfo_GET_CONV_HEX2SMALI");
 
+const SET_SELECTED_METHOD = "dexInfo_SET_SELECTED_METHOD";
+
 export const getParsing = createAction(GET_PARSING, (data) => data);
 export const getConvHex2Smali = createAction(
   GET_CONV_HEX2SMALI,
+  (data) => data
+);
+export const setSelectedMethod = createAction(
+  SET_SELECTED_METHOD,
   (data) => data
 );
 
@@ -34,6 +40,7 @@ export function* dexInfoSaga() {
 const initialState = {
   parsing: null,
   smali: null,
+  selected_method: null,
   error: null,
 };
 
@@ -61,6 +68,12 @@ const dexInfo = handleActions(
         ...state,
         smali: null,
         error: error,
+      };
+    },
+    [SET_SELECTED_METHOD]: (state, { payload: data }) => {
+      return {
+        ...state,
+        selected_method: data,
       };
     },
   },
