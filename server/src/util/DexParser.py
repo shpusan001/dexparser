@@ -621,7 +621,6 @@ class DexPaser:
                 res[i]["code"] = dict()
 
             del res[i]["method_idx_diff"]
-            del res[i]["access_flags"]
             del res[i]["code_off"]
 
             fp.seek(off)
@@ -663,7 +662,6 @@ class DexPaser:
                 res[i]["code"] = dict()
 
             del res[i]["method_idx_diff"]
-            del res[i]["access_flags"]
             del res[i]["code_off"]
 
             fp.seek(off)
