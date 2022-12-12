@@ -55,12 +55,12 @@ class TestInit(unittest.TestCase):
 #         res = dexPaser.getProtoIds()
 #         print(res)
 
-# class DexParserTest_getProtoFull(TestInit):
-#     def test_runs(self):
-#         dexPaser = DexPaser()
-#         dexPaser.setFile("./src/res/", "classes.dex")
-#         res = dexPaser.getProtoFull()
-#         print(res)
+class DexParserTest_getProtoFull(TestInit):
+    def test_runs(self):
+        dexPaser = DexPaser()
+        dexPaser.setFile("./src/res/", "classes.dex")
+        res = dexPaser.getProtoFulls()
+        print(res)
 
 
 
@@ -69,7 +69,6 @@ class TestInit(unittest.TestCase):
 #         dexPaser = DexPaser()
 #         dexPaser.setFile("./src/res/", "classes.dex")
 #         res = dexPaser.getFieldFull()
-#         print(res)
 
 
 # class DexParserTest_getMethodIds(TestInit):
@@ -77,7 +76,6 @@ class TestInit(unittest.TestCase):
 #         dexPaser = DexPaser()
 #         dexPaser.setFile("./src/res/", "classes.dex")
 #         res = dexPaser.getMethodIds()
-#         print(res)
 
 
 # class DexParserTest_getMethodFull(TestInit):
@@ -85,14 +83,13 @@ class TestInit(unittest.TestCase):
 #         dexPaser = DexPaser()
 #         dexPaser.setFile("./src/res/", "classes.dex")
 #         res = dexPaser.getMethodFull()
-#         print(res)
+#         pprint(res)
 
-class DexParserTest_getClassFull(TestInit):
-    def test_runs(self):
-        dexPaser = DexPaser()
-        dexPaser.setFile("./src/res/", "classes.dex")
-        res = dexPaser.getClassFull()
-        pprint.pprint(res)
+# class DexParserTest_getClassFull(TestInit):
+#     def test_runs(self):
+#         dexPaser = DexPaser()
+#         dexPaser.setFile("./src/res/", "classes.dex")
+#         res = dexPaser.getClassFull()
 
 # class DexDecompiler_disassemble(TestInit):
 #     def test_runs(self):

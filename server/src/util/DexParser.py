@@ -248,7 +248,7 @@ class DexPaser:
         fp.seek(off)
         return res
 
-    def convertTypeIdxToString(self, typeIdx: int, stringFull: List[StringDataFull], typeIds: List[TypeIdx]) -> str:
+    def convertTypeIdxToString(self, typeIdx: TypeIdx, stringFull: List[StringDataFull], typeIds: List[TypeIdx]) -> str:
         descritor_idx = typeIds[typeIdx].descriptor_idx
         res = stringFull[descritor_idx].string_data_full
         if res[0] not in ("L", "["):
@@ -284,7 +284,7 @@ class DexPaser:
         self.typeListCache[off] = res
         return res
 
-    def getProtoFull(self) -> List[ProtoFull]:
+    def getProtoFulls(self) -> List[ProtoFull]:
 
         if self.protoIds != None:
             return self.protoIds
@@ -320,34 +320,33 @@ class DexPaser:
 
         return res
 
-    def getFieldIds(self) -> List[FieldIdx]:
+    def getFieldIds(self) -> list:
         headers = self.getHeader()
 
         res = list()
 
-        fieldIdsSize = headers.field_ids_size
-        fieldIdsOff = headers.field_ids_off
+        fieldIdsSize = unpack("<I", headers["field_ids_size"])[0]
+        fieldIdsOff = unpack("<I", headers["field_ids_off"])[0]
+
         if fieldIdsOff == 0:
             return res
 
         fp = self.getfp('rb')
 
         fp.seek(fieldIdsOff)
- 
-        for _ in range(fieldIdsSize):
-            fieldIdxData = dict()
-            fieldIdxData["class_idx"] = unpack("<H", fp.read(2))[0]
-            fieldIdxData["type_idx"] = unpack("<H", fp.read(2))[0]
-            fieldIdxData["name_idx"] = unpack("<I", fp.read(4))[0]
 
-            fieldIdx = FieldIdx(**fieldIdxData)
-            res.append(fieldIdx)
+        for _ in range(fieldIdsSize):
+            fieldIdItem = dict()
+            fieldIdItem["class_idx"] = unpack("<H", fp.read(2))[0]
+            fieldIdItem["type_idx"] = unpack("<H", fp.read(2))[0]
+            fieldIdItem["name_idx"] = unpack("<I", fp.read(4))[0]
+            res.append(fieldIdItem)
 
         fp. close()
 
         return res
 
-    def getFieldFull(self) -> List[FieldFull]:
+    def getFieldFull(self) -> list:
         res = list()
 
         stringFull = self.getStringFull()
@@ -355,26 +354,24 @@ class DexPaser:
         fieldIds = self.getFieldIds()
 
         for field in fieldIds:
-            fieldFullData = dict()
-            fieldFullData["clazz"] = self.convertTypeIdxToString(
-                field.class_idx, stringFull, typeIds)
-            fieldFullData["type_full"] = self.convertTypeIdxToString(
-                field.type_idx, stringFull, typeIds)
-            fieldFullData["name"] = self.converStringIdxToString(
-                field.name_idx, stringFull)
-            
-            fieldFull = FieldFull(**fieldFullData)
+            fieldFull = dict()
+            fieldFull["class"] = self.convertTypeIdxToString(
+                field["class_idx"], stringFull, typeIds)
+            fieldFull["type"] = self.convertTypeIdxToString(
+                field["type_idx"], stringFull, typeIds)
+            fieldFull["name"] = self.converStringIdxToString(
+                field["name_idx"], stringFull)
             res.append(fieldFull)
 
         return res
 
-    def getMethodIds(self) -> List[MethodIdx]:
+    def getMethodIds(self) -> list:
         headers = self.getHeader()
 
         res = list()
 
-        methodIdsSize = headers.method_ids_size
-        methodIdsOff = headers.method_ids_off
+        methodIdsSize = unpack("<I", headers["method_ids_size"])[0]
+        methodIdsOff = unpack("<I", headers["method_ids_off"])[0]
 
         if methodIdsOff == 0:
             return res
@@ -384,19 +381,17 @@ class DexPaser:
         fp.seek(methodIdsOff)
 
         for _ in range(methodIdsSize):
-            methodIdxData = dict()
-            methodIdxData["class_idx"] = unpack("<H", fp.read(2))[0]
-            methodIdxData["proto_idx"] = unpack("<H", fp.read(2))[0]
-            methodIdxData["name_idx"] = unpack("<I", fp.read(4))[0]
-
-            methodIdx = MethodIdx(**methodIdxData)
-            res.append(methodIdx)
+            methodIdItem = dict()
+            methodIdItem["class_idx"] = unpack("<H", fp.read(2))[0]
+            methodIdItem["proto_idx"] = unpack("<H", fp.read(2))[0]
+            methodIdItem["name_idx"] = unpack("<I", fp.read(4))[0]
+            res.append(methodIdItem)
 
         fp. close()
 
         return res
 
-    def getMethodFull(self) -> List[MethodFull]:
+    def getMethodFull(self) -> list:
         res = list()
 
         stringFull = self.getStringFull()
@@ -405,26 +400,24 @@ class DexPaser:
         methodIds = self.getMethodIds()
 
         for method in methodIds:
-            methodFullData = dict()
-            methodFullData["clazz"] = self.convertTypeIdxToString(
-                method.class_idx, stringFull, typeIds)
-            methodFullData["proto"] = protoFull[method.proto_idx]
-            methodFullData["name"] = self.converStringIdxToString(
-                method.name_idx, stringFull)
-
-            methodFull = MethodFull(**methodFullData)
+            methodFull = dict()
+            methodFull["class"] = self.convertTypeIdxToString(
+                method["class_idx"], stringFull, typeIds)
+            methodFull["proto"] = protoFull[method["proto_idx"]]
+            methodFull["name"] = self.converStringIdxToString(
+                method["name_idx"], stringFull)
             res.append(methodFull)
 
         return res
 
-    def getClassIds(self) -> List[ClassIdx]:
+    def getClassIds(self) -> list:
 
         headers = self.getHeader()
 
         res = list()
 
-        classDefsSize = headers.class_defs_size
-        classDefsOff = headers.class_defs_off
+        classDefsSize = unpack("<I", headers["class_defs_size"])[0]
+        classDefsOff = unpack("<I", headers["class_defs_off"])[0]
 
         if classDefsOff == 0:
             return res
@@ -434,19 +427,16 @@ class DexPaser:
         fp.seek(classDefsOff)
 
         for _ in range(classDefsSize):
-            classIdsData = dict()
-            classIdsData["class_idx"] = unpack("<I", fp.read(4))[0]
-            classIdsData["access_flags"] = unpack("<I", fp.read(4))[0]
-            classIdsData["superclass_idx"] = unpack("<I", fp.read(4))[0]
-            classIdsData["interfaces_off"] = unpack("<I", fp.read(4))[0]
-            classIdsData["source_file_idx"] = unpack("<I", fp.read(4))[0]
-            classIdsData["annotation_off"] = unpack("<I", fp.read(4))[0]
-            classIdsData["class_data_off"] = unpack("<I", fp.read(4))[0]
-            classIdsData["static_values_off"] = unpack("<I", fp.read(4))[0]
-
-            classIds = ClassIdx(**classIdsData)
-
-            res.append(classIds)
+            classDefItem = dict()
+            classDefItem["class_idx"] = unpack("<I", fp.read(4))[0]
+            classDefItem["access_flags"] = unpack("<I", fp.read(4))[0]
+            classDefItem["superclass_idx"] = unpack("<I", fp.read(4))[0]
+            classDefItem["interfaces_off"] = unpack("<I", fp.read(4))[0]
+            classDefItem["source_file_idx"] = unpack("<I", fp.read(4))[0]
+            classDefItem["annotatios_off"] = unpack("<I", fp.read(4))[0]
+            classDefItem["class_data_off"] = unpack("<I", fp.read(4))[0]
+            classDefItem["static_values_off"] = unpack("<I", fp.read(4))[0]
+            res.append(classDefItem)
 
         fp. close()
         return res
@@ -459,15 +449,13 @@ class DexPaser:
     #     annotDirItem["class_annotations_off"] = unpack("<I", fp.read(4))[0]
     #     annotDirItem["access_flags"] = unpack("<I", fp.read(4))[0]
 
-    def readStaticFields(self, fp, off: int, size: int, dataPack: ClassDataPack) -> List[StaticField]:
+    def readStaticFields(self, fp, off: int, size: int, dataPack: dict) -> list:
 
         fp.seek(off)
 
-        fieldFull = dataPack.fieldFull
-
         res = list()
 
-        fields = list()
+        fieldFull = dataPack["fieldFull"]
 
         for _ in range(size):
             encodedField = dict()
@@ -477,36 +465,30 @@ class DexPaser:
             encodedField["access_flags"] = readLEB128ToInt(fp, off)
             off = fp.tell()
 
-            fields.append(encodedField)
+            res.append(encodedField)
 
         tmp = 0
         for i in range(len(res)):
             if i == 0:
-                tmp = fields[i]["field_idx_diff"]
-                fields[i]["field"] = fieldFull[tmp]
-                tmp += fields[i]["field_idx_diff"]
-                fields[i]["field"] = fieldFull[tmp]
+                tmp = res[i]["field_idx_diff"]
+                res[i]["field"] = fieldFull[tmp]
+            else:
+                tmp += res[i]["field_idx_diff"]
+                res[i]["field"] = fieldFull[tmp]
 
-            fields[i]["access_flags"] = self.convertAccessFlagToString(
-                fields[i]["access_flags"], ACCESS_FLAG)
+            res[i]["access_flags"] = self.convertAccessFlagToString(
+                res[i]["access_flags"], ACCESS_FLAG)
 
-            del fields[i]["field_idx_diff"]
-
-            staticFieldData = fields[i]
-            staticField = StaticField(**staticFieldData)
-            res.append(staticField)
-            
+            del res[i]["field_idx_diff"]
 
         return res
 
-    def readInstanceFields(self, fp, off: int, size: int, dataPack: ClassDataPack) -> List[InstanceField]:
+    def readInstanceFields(self, fp, off: int, size: int, dataPack: dict) -> list:
         fp.seek(off)
-
-        fieldFull = dataPack.fieldFull
 
         res = list()
 
-        fields = list()
+        fieldFull = dataPack["fieldFull"]
 
         for _ in range(size):
             encodedField = dict()
@@ -516,140 +498,125 @@ class DexPaser:
             encodedField["access_flags"] = readLEB128ToInt(fp, off)
             off = fp.tell()
 
-            fields.append(encodedField)
+            res.append(encodedField)
 
         tmp = 0
         for i in range(len(res)):
             if i == 0:
-                tmp = fields[i]["field_idx_diff"]
-                fields[i]["field"] = fieldFull[tmp]
-                tmp += fields[i]["field_idx_diff"]
-                fields[i]["field"] = fieldFull[tmp]
+                tmp = res[i]["field_idx_diff"]
+                res[i]["field"] = fieldFull[tmp]
+            else:
+                tmp += res[i]["field_idx_diff"]
+                res[i]["field"] = fieldFull[tmp]
 
-            fields[i]["access_flags"] = self.convertAccessFlagToString(
-                fields[i]["access_flags"], ACCESS_FLAG)
+            res[i]["access_flags"] = self.convertAccessFlagToString(
+                res[i]["access_flags"], ACCESS_FLAG)
 
-            del fields[i]["field_idx_diff"]
-
-            instanceFieldData = fields[i]
-            instanceField = InstanceField(**instanceFieldData)
-            res.append(instanceField)
-            
+            del res[i]["field_idx_diff"]
 
         return res
 
-    def getTryItem(self, fp, off: int) -> TryItem:
+    def getTryItem(self, fp, off: int) -> dict:
 
         fp.seek(off)
 
-        tryItemData = dict()
+        res = dict()
 
-        tryItemData["start_addr"] = unpack("<I", fp.read(4))[0]
-        tryItemData["insn_count"] = unpack("<H", fp.read(2))[0]
-        tryItemData["handler_off"] = unpack("<H", fp.read(2))[0]
+        res["start_addr"] = unpack("<I", fp.read(4))[0]
+        res["insn_count"] = unpack("<H", fp.read(2))[0]
+        res["handler_off"] = unpack("<H", fp.read(2))[0]
 
-        tryItem= TryItem(**tryItemData)
+        return res
 
-        return tryItem
-
-    def getEncodedTypeAddrPair(self, fp, off: int) -> EncodedTypeAddrPair:
+    def getEncodedTypeAddrPair(self, fp, off: int) -> dict:
         fp.seek(off)
 
-        encodedTypeAddrPairData = dict()
+        res = dict()
 
-        encodedTypeAddrPairData["type_idx"] = readLEB128ToInt(fp, off)
+        res["type_idx"] = readLEB128ToInt(fp, off)
         off = fp.tell()
-        encodedTypeAddrPairData["addr"] = readLEB128ToInt(fp, off)
+        res["addr"] = readLEB128ToInt(fp, off)
         off = fp.tell()
 
-        encodedTypeAddrPair = EncodedTypeAddrPair(**encodedTypeAddrPairData)
+        return res
 
-        return encodedTypeAddrPair
-
-    def getEncodedCatchHandler(self, fp, off: int) -> EncodedCatchHandler:
+    def getEncodedCatchHandler(self, fp, off: int) -> dict:
 
         fp.seek(off)
 
-        encodedCatchHandlerData = dict()
+        res = dict()
 
-        encodedCatchHandlerData["size"] = readSLEB128ToInt(fp, off)
+        res["size"] = readSLEB128ToInt(fp, off)
         off = fp.tell()
 
-        encodedTypeAddrPairList = list()
-        for _ in range(abs(encodedCatchHandlerData["size"])):
-            encodedTypeAddrPairList.append(self.getEncodedTypeAddrPair(fp, off))
-        encodedCatchHandlerData["handlers"] = encodedTypeAddrPairList
+        tmp = list()
+        for _ in range(abs(res["size"])):
+            tmp.append(self.getEncodedTypeAddrPair(fp, off))
+        res["handlers"] = tmp
 
-        if encodedCatchHandlerData["size"] < 0:
-            encodedCatchHandlerData["catch_all_addr"] = readLEB128ToInt(fp, off)
+        if res["size"] < 0:
+            res["catch_all_addr"] = readLEB128ToInt(fp, off)
             off = fp.tell()
         else:
-            encodedCatchHandlerData["catch_all_addr"] = -1
+            res["catch_all_addr"] = "NONE"
 
-        encodedCatchHandler = EncodedCatchHandler(**encodedCatchHandlerData)
-
-        return encodedCatchHandler
+        return res
 
     def getEncodedCatchHandlerList(self, fp, off: int) -> dict:
 
         fp.seek(off)
 
-        encodedCatchHandlerListData = dict()
+        res = dict()
 
-        encodedCatchHandlerListData["size"] = readLEB128ToInt(fp, off)
+        res["size"] = readLEB128ToInt(fp, off)
         off = fp.tell()
-
-        handlerList = list()
-        for _ in range(encodedCatchHandlerListData["size"]):
-            handlerList.append(self.getEncodedCatchHandler(fp, off))
-        encodedCatchHandlerListData["handler_list"] = handlerList
-
-        encodedCatchHandlerList = EncodedCatchHandlerList(**encodedCatchHandlerListData)
-
-        return encodedCatchHandlerList
-
-    def getCodeItem(self, fp, off: int) -> CodeItem:
-
-        fp.seek(off)
-
-        CodeItemData = dict()
-
-        CodeItemData["register_size"] = unpack("<H", fp.read(2))[0]
-        CodeItemData["ins_size"] = unpack("<H", fp.read(2))[0]
-        CodeItemData["outs_size"] = unpack("<H", fp.read(2))[0]
-        CodeItemData["tries_size"] = unpack("<H", fp.read(2))[0]
-        CodeItemData["debug_into_off"] = unpack("<I", fp.read(4))[0]
-        CodeItemData["insns_size"] = unpack("<I", fp.read(4))[0]
-
-        tmp = str()
-        for i in range(CodeItemData["insns_size"]):
-            tmp = tmp + fp.read(2).hex()
-
-        CodeItemData["insns"] = tmp
-
-        if CodeItemData["tries_size"] != 0 and CodeItemData["insns_size"] % 2 == 1:
-            CodeItemData["padding"] = unpack("<H", fp.read(2))[0]
 
         tmp = list()
-        for _ in range(CodeItemData["tries_size"]):
+
+        for _ in range(res["size"]):
+            tmp.append(self.getEncodedCatchHandler(fp, off))
+        res["list"] = tmp
+
+        return res
+
+    def getCodeItem(self, fp, off: int) -> dict:
+
+        fp.seek(off)
+
+        res = dict()
+
+        res["register_size"] = unpack("<H", fp.read(2))[0]
+        res["ins_size"] = unpack("<H", fp.read(2))[0]
+        res["outs_size"] = unpack("<H", fp.read(2))[0]
+        res["tries_size"] = unpack("<H", fp.read(2))[0]
+        res["debug_into_off"] = unpack("<I", fp.read(4))[0]
+        res["insns_size"] = unpack("<I", fp.read(4))[0]
+
+        tmp = str()
+        for i in range(res["insns_size"]):
+            tmp = tmp + fp.read(2).hex()
+
+        res["insns"] = tmp
+
+        if res["tries_size"] != 0 and res["insns_size"] % 2 == 1:
+            res["padding"] = unpack("<H", fp.read(2))[0]
+
+        tmp = list()
+        for _ in range(res["tries_size"]):
             tmp.append(self.getTryItem(fp, fp.tell()))
-        CodeItemData["tries"] = tmp
+        res["tries"] = tmp
 
-        if CodeItemData["tries_size"] != 0:
-            CodeItemData["handler"] = self.getEncodedCatchHandlerList(fp, fp.tell())
+        if res["tries_size"] != 0:
+            res["handler"] = self.getEncodedCatchHandlerList(fp, fp.tell())
 
-        codeItem = CodeItem(**CodeItemData)
+        return res
 
-        return codeItem
-
-    def readDirectMethods(self, fp, off: int, size: int, dataPack: ClassDataPack) -> List[DirectMethod]:
+    def readDirectMethods(self, fp, off: int, size: int, dataPack: dict) -> list:
         fp.seek(off)
-
-        fields = list()
 
         res = list()
 
-        methodFull = dataPack.methodFull
+        methodFull = dataPack["methodFull"]
 
         for _ in range(size):
             encodedField = dict()
@@ -660,44 +627,38 @@ class DexPaser:
             off = fp.tell()
             encodedField["code_off"] = readLEB128ToInt(fp, off)
             off = fp.tell()
-            fields.append(encodedField)
+            res.append(encodedField)
 
         tmp = 0
-        for i in range(len(fields)):
+        for i in range(len(res)):
             if i == 0:
-                tmp = fields[i]["method_idx_diff"]
-                fields[i]["method"] = methodFull[tmp]
+                tmp = res[i]["method_idx_diff"]
+                res[i]["method"] = methodFull[tmp]
             else:
-                tmp += fields[i]["method_idx_diff"]
-                fields[i]["method"] = methodFull[tmp]
+                tmp += res[i]["method_idx_diff"]
+                res[i]["method"] = methodFull[tmp]
 
-            fields[i]["access_flags"] = self.convertAccessFlagToString(
-                fields[i]["access_flags"], ACCESS_FLAG)
-
-            if fields[i]["code_off"] != 0:
-                fields[i]["code"] = self.getCodeItem(fp, fields[i]["code_off"])
+            res[i]["access_flags"] = self.convertAccessFlagToString(
+                res[i]["access_flags"], ACCESS_FLAG)
+            if res[i]["code_off"] != 0:
+                res[i]["code"] = self.getCodeItem(fp, res[i]["code_off"])
             else:
-                fields[i]["code"] = None
+                res[i]["code"] = dict()
 
-            del fields[i]["method_idx_diff"]
-            del fields[i]["code_off"]
-
-            directMethodData = fields[i]
-            directMethod = DirectMethod(**directMethodData)
-            res.append(directMethod)
+            del res[i]["method_idx_diff"]
+            del res[i]["access_flags"]
+            del res[i]["code_off"]
 
             fp.seek(off)
 
         return res
 
-    def readVirtualMethods(self, fp, off: int, size: int, dataPack: ClassDataPack) -> List[VirtualMethod]:
+    def readVirtualMethods(self, fp, off: int, size: int, dataPack: dict) -> list:
         fp.seek(off)
-
-        fields = list()
 
         res = list()
 
-        methodFull = dataPack.methodFull
+        methodFull = dataPack["methodFull"]
 
         for _ in range(size):
             encodedField = dict()
@@ -708,64 +669,58 @@ class DexPaser:
             off = fp.tell()
             encodedField["code_off"] = readLEB128ToInt(fp, off)
             off = fp.tell()
-            fields.append(encodedField)
+            res.append(encodedField)
 
         tmp = 0
-        for i in range(len(fields)):
+        for i in range(len(res)):
             if i == 0:
-                tmp = fields[i]["method_idx_diff"]
-                fields[i]["method"] = methodFull[tmp]
+                tmp = res[i]["method_idx_diff"]
+                res[i]["method"] = methodFull[tmp]
             else:
-                tmp += fields[i]["method_idx_diff"]
-                fields[i]["method"] = methodFull[tmp]
+                tmp += res[i]["method_idx_diff"]
+                res[i]["method"] = methodFull[tmp]
 
-            fields[i]["access_flags"] = self.convertAccessFlagToString(
-                fields[i]["access_flags"], ACCESS_FLAG)
-
-            if fields[i]["code_off"] != 0:
-                fields[i]["code"] = self.getCodeItem(fp, fields[i]["code_off"])
+            res[i]["access_flags"] = self.convertAccessFlagToString(
+                res[i]["access_flags"], ACCESS_FLAG)
+            if res[i]["code_off"] != 0:
+                res[i]["code"] = self.getCodeItem(fp, res[i]["code_off"])
             else:
-                fields[i]["code"] = None
+                res[i]["code"] = dict()
 
-            del fields[i]["method_idx_diff"]
-            del fields[i]["code_off"]
-
-            virtualMethodData = fields[i]
-            virtualMethod = VirtualMethod(**virtualMethodData)
-            res.append(virtualMethod)
+            del res[i]["method_idx_diff"]
+            del res[i]["access_flags"]
+            del res[i]["code_off"]
 
             fp.seek(off)
 
         return res
 
-    def getClassDataItem(self, fp, off: int, dataPack: ClassDataPack) -> ClassDataItem:
+    def getClassDataItem(self, fp, off: int, dataPack: dict):
 
         fp.seek(off)
 
-        classDataItemData = dict()
+        classDataItem = dict()
 
-        classDataItemData["static_fields_size"] = readLEB128ToInt(fp, off)
+        classDataItem["static_fields_size"] = readLEB128ToInt(fp, off)
         off = fp.tell()
-        classDataItemData["instance_fields_size"] = readLEB128ToInt(fp, off)
+        classDataItem["instance_fields_size"] = readLEB128ToInt(fp, off)
         off = fp.tell()
-        classDataItemData["direct_methods_size"] = readLEB128ToInt(fp, off)
+        classDataItem["direct_methods_size"] = readLEB128ToInt(fp, off)
         off = fp.tell()
-        classDataItemData["virtual_methods_size"] = readLEB128ToInt(fp, off)
+        classDataItem["virtual_methods_size"] = readLEB128ToInt(fp, off)
         off = fp.tell()
-        classDataItemData["static_fields"] = self.readStaticFields(
-            fp, off, classDataItemData["static_fields_size"], dataPack)
+        classDataItem["static_fields"] = self.readStaticFields(
+            fp, off, classDataItem["static_fields_size"], dataPack)
         off = fp.tell()
-        classDataItemData["instance_fields"] = self.readInstanceFields(
-            fp, off, classDataItemData["instance_fields_size"], dataPack)
+        classDataItem["instance_fields"] = self.readInstanceFields(
+            fp, off, classDataItem["instance_fields_size"], dataPack)
         off = fp.tell()
-        classDataItemData["direct_methods"] = self.readDirectMethods(
-            fp, off, classDataItemData["direct_methods_size"], dataPack)
+        classDataItem["direct_methods"] = self.readDirectMethods(
+            fp, off, classDataItem["direct_methods_size"], dataPack)
         off = fp.tell()
-        classDataItemData["virtual_methods"] = self.readVirtualMethods(
-            fp, off, classDataItemData["virtual_methods_size"], dataPack)
+        classDataItem["virtual_methods"] = self.readVirtualMethods(
+            fp, off, classDataItem["virtual_methods_size"], dataPack)
         off = fp.tell()
-
-        classDataItem = ClassDataItem(**classDataItemData)
 
         return classDataItem
 
@@ -779,43 +734,41 @@ class DexPaser:
         classIds = self.getClassIds()
 
         # 매개 변수에 삽입 할 때  사용
-        classDataPackData = dict()
-        classDataPackData["stringFull"] = stringFull
-        classDataPackData["fieldFull"] = fieldFull
-        classDataPackData["methodFull"] = methodFull
-        
-        classDataPack = ClassDataPack(**classDataPackData)
+        classDataPack = dict()
+        classDataPack["stringFull"] = stringFull
+        classDataPack["fieldFull"] = fieldFull
+        classDataPack["methodFull"] = methodFull
 
         fp = self.getfp("rb")
 
         for clazz in classIds:
-            classFullData = dict()
-            classFullData["clazz"] = self.convertTypeIdxToString(
-                clazz.class_idx, stringFull, typeIds)
-            classFullData["access_flags"] = self.convertAccessFlagToString(
-                clazz.access_flags, ACCESS_FLAG)
-            classFullData["superclass"] = self.convertTypeIdxToString(
-                clazz.superclass_idx, stringFull, typeIds)
+            clazzFull = dict()
+            clazzFull["class"] = self.convertTypeIdxToString(
+                clazz["class_idx"], stringFull, typeIds)
+            clazzFull["access_flags"] = self.convertAccessFlagToString(
+                clazz["access_flags"], ACCESS_FLAG)
+            clazzFull["superclass"] = self.convertTypeIdxToString(
+                clazz["superclass_idx"], stringFull, typeIds)
 
-            if clazz.interfaces_off == 0:
-                classFullData["interfaces"] = []
+            if clazz["interfaces_off"] == 0:
+                clazzFull["interfaces"] = []
             else:
-                classFullData["interfaces"] = self.getTypeListFulls(fp, clazz.interfaces_off)
- 
-            if clazz.source_file_idx != NO_INDEX:
-                classFullData["source_file"] = self.converStringIdxToString(
-                    clazz.source_file_idx, stringFull)
-            else:
-                classFullData["source_file"] = "NOT_EXIST"
+                clazzFull["interfaces"] = self.getTypeListFull(
+                    fp, clazz["interfaces_off"])
 
-            if clazz.class_data_off != 0:
-                classFullData["class_data"] = self.getClassDataItem(
-                    fp, clazz.class_data_off, classDataPack)
+            if clazz["source_file_idx"] != NO_INDEX:
+                clazzFull["source_file"] = self.converStringIdxToString(
+                    clazz["source_file_idx"], stringFull)
             else:
-                classFullData["class_data"] = None
+                clazzFull["source_file"] = "NOT_EXIST"
 
-            classFull = ClassFull(**classFullData)
-            res.append(classFull)
+            if clazz["class_data_off"] != 0:
+                clazzFull["class_data"] = self.getClassDataItem(
+                    fp, clazz["class_data_off"], classDataPack)
+            else:
+                clazzFull["class_data"] = "NOT_EXIST_CLASSDATA"
+
+            res.append(clazzFull)
 
         fp.close()
 
