@@ -5,8 +5,6 @@ import pprint
 from struct import *
 import leb128
 import sys
-from src.data.DexparserFormat import *
-from typing import List
 
 sys.path.append('.')
 
@@ -22,10 +20,10 @@ class DexPaser:
 
         self.pathType = "ONE"  # ONE or TWO
 
-        self.header:Header = None
-        self.stringFull:List(StringDataFull) = None
-        self.typeIds:List[TypeIdx] = None
-        self.typeFull:List[TypeIdxFull] = None
+        self.header = None
+        self.stringFull = None
+        self.typeIds = None
+        self.typeFull = None
         self.protoIds = None
         self.protoFull = None
 
@@ -51,25 +49,23 @@ class DexPaser:
 
     # 덱스 헤더를 파싱하고 dict로 반환한다
     # 헤더 아이템 정의 : https://source.android.com/docs/core/dalvik/dex-format?hl=ko#header-item
-    def getHeader(self) -> Header:
+    def getHeader(self) -> dict:
 
         if self.header != None:
             return self.header
 
         # format: (name, readsize)
         headerNames = [
-            ("magic", 8, "bytes"), ("checksum", 4, "bytes"), ("signature",
-                                                              20, "bytes"), ("file_size", 4, "int"),
-            ("header_size", 4, "int"), ("endian_tag",
-                                        4, "bytes"), ("link_size", 4, "int"), ("link_off", 4, "int"),
-            ("map_off", 4, "int"), ("string_ids_size",
-                                    4, "int"), ("string_ids_off", 4, "int"), ("type_ids_size", 4, "int"),
-            ("type_ids_off", 4, "int"), ("proto_ids_size",
-                                         4, "int"), ("proto_ids_off", 4, "int"), ("field_ids_size", 4, "int"),
-            ("field_ids_off", 4, "int"), ("method_ids_size",
-                                          4, "int"), ("method_ids_off", 4, "int"), ("class_defs_size", 4, "int"),
-            ("class_defs_off", 4, "int"), ("data_size",
-                                           4, "int"), ("data_off", 4, "int")
+            ("magic", 8), ("checksum", 4), ("signature", 20), ("file_size", 4),
+            ("header_size", 4), ("endian_tag",
+                                 4), ("link_size", 4), ("link_off", 4),
+            ("map_off", 4), ("string_ids_size",
+                             4), ("string_ids_off", 4), ("type_ids_size", 4),
+            ("type_ids_off", 4), ("proto_ids_size",
+                                  4), ("proto_ids_off", 4), ("field_ids_size", 4),
+            ("field_ids_off", 4), ("method_ids_size",
+                                   4), ("method_ids_off", 4), ("class_defs_size", 4),
+            ("class_defs_off", 4), ("data_size", 4), ("data_off", 4)
         ]
         res = dict()
 
@@ -77,23 +73,19 @@ class DexPaser:
         fp.seek(0)
 
         for name in headerNames:
-            if name[2] == "bytes":
-                res[name[0]] = fp.read(name[1])
-            elif name[2] == "int":
-                res[name[0]] = unpack("<I", fp.read(name[1]))[0]
+            res[name[0]] = fp.read(name[1])
+
         fp.close()
-
-        res = Header(**res)
-
         return res
 
-    def getStringIds(self) -> List[StringDataOff]:
+    def getStringIds(self) -> list:
+        STRING_ID_ITEM_SIZE = 4
 
         fp = self.getfp('rb')
         headers = self.getHeader()
-        stringIdsSize = headers.string_ids_size
-        stringIdsOff = headers.string_ids_off
-        res = list()
+        stringIdsSize = unpack("<I", headers["string_ids_size"])[0]
+        stringIdsOff = unpack("<I", headers["string_ids_off"])[0]
+        stringIdsOffs = list()
 
         if stringIdsOff == 0:
             return stringIdsOff
@@ -102,15 +94,13 @@ class DexPaser:
         fp.seek(stringIdsOff)
 
         for _ in range(stringIdsSize):
-            data = {"string_data_off": unpack(
-                "<I", fp.read(4))[0]}
-            stringDataOff = StringDataOff(**data)
-            res.append(stringDataOff)
+            stringIdsOffs.append({"string_data_off": unpack(
+                "<I", fp.read(STRING_ID_ITEM_SIZE))[0]})
 
         fp.close()
-        return res
+        return stringIdsOffs
 
-    def getStringFull(self) -> List[StringDataFull]:
+    def getStringFull(self) -> list:
 
         if self.stringFull != None:
             return self.stringFull
@@ -119,8 +109,8 @@ class DexPaser:
         stringIds = self.getStringIds()
         fp = self.getfp('rb')
 
-        for stringIdx in stringIds:
-            off = stringIdx.string_data_off
+        for idx in stringIds:
+            off = idx["string_data_off"]
 
             fp.seek(off)
             # 스트링의 크기를 나타내는 데이터의 크기
@@ -130,10 +120,8 @@ class DexPaser:
             stringSize = unpack(str(LEB128Size) + "s", fp.read(LEB128Size))[0]
             stringSize = leb128.u.decode(stringSize)
 
-            data = {"string_data_full": unpack(
-                str(stringSize)+"s", fp.read(stringSize))[0].decode('latin_1')}
-            string_data_full = StringDataFull(**data)
-            res.append(string_data_full)
+            res.append({"string_data_full": unpack(
+                str(stringSize)+"s", fp.read(stringSize))[0].decode('latin_1')})
 
         fp.close()
 
@@ -141,7 +129,7 @@ class DexPaser:
 
         return res
 
-    def getTypeIds(self) -> List[TypeIdx]:
+    def getTypeIds(self) -> list:
 
         if self.typeIds != None:
             return self.typeIds
@@ -152,8 +140,8 @@ class DexPaser:
 
         headers = self.getHeader()
 
-        typeIdsSize = headers.type_ids_size
-        typeIdsOff = headers.type_ids_off
+        typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
+        typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
 
         fp = fp = self.getfp('rb')
 
@@ -163,35 +151,42 @@ class DexPaser:
         fp.seek(typeIdsOff)
 
         for _ in range(typeIdsSize):
-            readData = unpack("<I", fp.read(TYPE_ID_ITEM_SIZE))[0]
-            typeIdxData = {"descriptor_idx": readData}
-
-            typeIdx = TypeIdx(**typeIdxData)
-            res.append(typeIdx)
+            typeIdItem = fp.read(TYPE_ID_ITEM_SIZE)
+            typeIdItem = unpack("<I", typeIdItem)[0]
+            res.append({"descriptor_idx": typeIdItem})
 
         fp.close()
 
         return res
 
-    def getTypeFull(self) -> List[TypeIdxFull]:
+    def getTypeFull(self) -> list:
 
         if self.typeFull != None:
             return self.typeFull
 
+        TYPE_ID_ITEM_SIZE = 4
+
         res = list()
 
+        headers = self.getHeader()
         stringFull = self.getStringFull()
-        typeIds = self.getTypeIds()
+
+        typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
+        typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
 
         fp = fp = self.getfp('rb')
 
+        if typeIdsOff == 0:
+            return res
+
+        fp.seek(typeIdsOff)
+
         res = list()
 
-        for typeIdx in typeIds:
-            typeStringData = stringFull[typeIdx.descriptor_idx]
-            typeIdxFullData = {"descriptor_full": typeStringData.string_data_full}
-            typeIdxFull = TypeIdxFull(**typeIdxFullData)
-            res.append(typeIdxFull)
+        for _ in range(typeIdsSize):
+            typeIdItem = fp.read(TYPE_ID_ITEM_SIZE)
+            typeIdItem = unpack("<I", typeIdItem)[0]
+            res.append({"descriptor_full": stringFull[typeIdItem]})
 
         fp.close()
 
@@ -199,7 +194,7 @@ class DexPaser:
 
         return res
 
-    def getProtoIds(self) -> List[ProtoIdx]:
+    def getProtoIds(self) -> list:
 
         if self.protoIds != None:
             return self.protoIds
@@ -208,8 +203,8 @@ class DexPaser:
 
         res = list()
 
-        protoIdsSize = headers.proto_ids_size
-        protoIdsOff = headers.proto_ids_off
+        protoIdsSize = unpack("<I", headers["proto_ids_size"])[0]
+        protoIdsOff = unpack("<I", headers["proto_ids_off"])[0]
 
         if protoIdsOff == 0:
             return res
@@ -219,20 +214,17 @@ class DexPaser:
         fp.seek(protoIdsOff)
 
         for _ in range(protoIdsSize):
-            protoIdxData = dict()
-            protoIdxData["shorty_idx"] = unpack("<I", fp.read(4))[0]
-            protoIdxData["return_type_idx"] = unpack("<I", fp.read(4))[0]
-            protoIdxData["parameters_off"] = unpack("<I", fp.read(4))[0]
-
-            protoIdx = ProtoIdx(**protoIdxData)
-            
-            res.append(protoIdx)
+            protoIdItem = dict()
+            protoIdItem["shorty_idx"] = unpack("<I", fp.read(4))[0]
+            protoIdItem["return_type_idx"] = unpack("<I", fp.read(4))[0]
+            protoIdItem["parameters_off"] = unpack("<I", fp.read(4))[0]
+            res.append(protoIdItem)
 
         fp. close()
 
         return res
 
-    def getTypeListIds(self, fp, off: int) -> List[TypeListIdx]:
+    def getTypeListIds(self, fp, off: int) -> list:
         res = list()
 
         fp.seek(off)
@@ -240,23 +232,12 @@ class DexPaser:
         size = unpack("<I", fp.read(4))[0]
 
         for _ in range(size):
-            readData = unpack("<H", fp.read(2))[0]
-            typeListIdxData = {"type_list_idx": readData}
-            typeListIdx = TypeListIdx(**typeListIdxData)
-            res.append(typeListIdx)
+            res.append(unpack("<H", fp.read(2))[0])
 
         fp.seek(off)
         return res
 
-    def convertTypeIdxToString(self, typeIdx: TypeIdx, stringFull: List[StringDataFull], typeIds: List[TypeIdx]) -> str:
-        descritor_idx = typeIds[typeIdx].descriptor_idx
-        res = stringFull[descritor_idx].string_data_full
-        if res[0] not in ("L", "["):
-            return TYPE_DESCRIPTOR[res[0]]
-        else:
-            return res[1:]
-            
-    def getTypeListFulls(self, fp, off: int) -> List[TypeListFull]:
+    def getTypeListFull(self, fp, off: int) -> list:
         res = list()
 
         if off in self.typeListCache:
@@ -268,23 +249,16 @@ class DexPaser:
         fp.seek(off)
 
         size = unpack("<I", fp.read(4))[0]
-
         for _ in range(size):
-
-            readData = unpack("<H", fp.read(2))[0]
-            typeListIdxData = {"type_list_idx": readData}
-            typeListIdx = TypeListIdx(**typeListIdxData)
-            
-            string = self.convertTypeIdxToString(typeListIdx.type_list_idx, stringFull, typeIds)
-            typeListFullData = {"type_list_full": string}
-            typeListFull = TypeListFull(**typeListFullData)
-            res.append(typeListFull)
+            typeIdx = unpack("<H", fp.read(2))[0]
+            string = self.convertTypeIdxToString(typeIdx, stringFull, typeIds)
+            res.append(string)
         fp.seek(off)
 
         self.typeListCache[off] = res
         return res
 
-    def getProtoFulls(self) -> List[ProtoFull]:
+    def getProtoFull(self) -> list:
 
         if self.protoIds != None:
             return self.protoIds
@@ -295,24 +269,25 @@ class DexPaser:
 
         fp = self.getfp('rb')
 
-        res = list()
+        for proto in protoIds:
 
-        for protoIdx in protoIds:
-            protoFullData = dict()
-            protoFullData["shorty"] = self.converStringIdxToString(
-                protoIdx.shorty_idx, stringFull)
+            proto["shorty"] = self.converStringIdxToString(
+                proto["shorty_idx"], stringFull)
 
-            protoFullData["return_type"] = self.convertTypeIdxToString(
-                protoIdx.return_type_idx, stringFull, typeIds)
+            proto["return_type"] = self.convertTypeIdxToString(
+                proto["return_type_idx"], stringFull, typeIds)
 
-            if protoIdx.parameters_off== 0:
-                protoFullData["parameters"]= []
+            if proto["parameters_off"] == 0:
+                proto["parameters"] = []
             else:
-                protoFullData["parameters"]= self.getTypeListFulls(
-                    fp, protoIdx.parameters_off)
-            
-            protoFull = ProtoFull(**protoFullData) 
-            res.append(protoFull)
+                proto["parameters"] = self.getTypeListFull(
+                    fp, proto["parameters_off"])
+
+            del proto["shorty_idx"]
+            del proto["return_type_idx"]
+            del proto["parameters_off"]
+
+        res = protoIds
 
         fp.close()
 
@@ -777,10 +752,17 @@ class DexPaser:
         #     external_file.close()
         return res
 
-    def converStringIdxToString(self, stringIdx: int, stringFull: List[StringDataFull]) -> str:
-        res = stringFull[stringIdx].string_data_full
+    def converStringIdxToString(self, stringIdx: int, stringFull: list) -> str:
+        res = stringFull[stringIdx]["string_data_full"]
         return res
 
+    def convertTypeIdxToString(self, typeIdx: int, stringFull: list, typeIds: list) -> str:
+        stringIdx = typeIds[typeIdx]["descriptor_idx"]
+        res = stringFull[stringIdx]["string_data_full"]
+        if res[0] not in ("L", "["):
+            return TYPE_DESCRIPTOR[res[0]]
+        else:
+            return res[1:]
 
     def convertAccessFlagToString(self, accessFlag: int, accessFlagDict: dict) -> list:
 
