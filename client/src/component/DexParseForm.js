@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { getParsing } from "../module/dex";
 import { useSelector } from "react-redux";
+import { ProgressBar } from "react-bootstrap";
 
 export default function DexParseForm() {
   const [fileId, setFileId] = useState(null);
@@ -43,6 +44,11 @@ export default function DexParseForm() {
             <div class="container">
               <div class="spinner-border text-primary" role="status"></div>
             </div>
+          )}
+        </div>
+        <div class="col-12 w-100 mt-4 mb-1">
+          {loading.dexInfo_GET_PARSING && (
+            <ProgressBar striped animated variant="success" now={50} />
           )}
         </div>
       </form>
