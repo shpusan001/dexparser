@@ -6,7 +6,7 @@ export default function DexInfoPage() {
   return (
     <>
       <Header />
-      <div class="container h-100">
+      <div class="container">
         <DexParseForm />
         <DexInfo />
       </div>

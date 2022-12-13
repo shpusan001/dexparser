@@ -28,7 +28,7 @@ export default function ApkList(props) {
   };
 
   const renderApkList = () => {
-    console.log(apkList)
+    console.log(apkList);
     if (apkList != null && apkList != undefined) {
       setFileList(
         apkList.files.map((e, i) => (
@@ -46,7 +46,7 @@ export default function ApkList(props) {
   return (
     <>
       <h2 class="justify-content-center">APK List</h2>
-      <div onClick={refresh}>새로고침</div>
+      {/* <div onClick={refresh}>새로고침</div> */}
       {fileList}
     </>
   );

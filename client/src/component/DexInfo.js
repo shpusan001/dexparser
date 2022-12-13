@@ -1,15 +1,49 @@
 import CodeBox from "../component/CodeBox";
 import DexListItem from "../component/DexListItem";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import styled from "styled-components";
+
+const InfoBox = styled.div`
+  height: calc(100vh - 225px);
+`;
+
+const ListBox = styled.div`
+  max-height: calc(100vh - 225px);
+`;
 
 export default function DexInfo() {
   let parsedData = useSelector((state) => state.dexInfo.parsing);
   let loading = useSelector((state) => state.loading);
+  const [renderedClassList, setRenderedClassList] = useState(null);
+  const [renderedFileBtnList, setRenderedBtnList] = useState(null);
 
   useEffect(() => {
-    renderClassList();
+    setRenderedClassList(renderClassList());
+    setRenderedBtnList(renderFileBtnList());
+
+    console.log(renderedClassList);
+    console.log(renderedFileBtnList);
   }, [loading]);
+
+  const renderFileBtnList = () => {
+    if (renderedClassList == null) {
+      return;
+    }
+
+    const fileBtnList = [];
+
+    for (let i = 0; i < renderedClassList.length; i++) {
+      const dexFileBtn = (
+        <button key="" class="btn btn-secondary">
+          {renderedClassList[i].fileName}
+        </button>
+      );
+      fileBtnList.push(dexFileBtn);
+    }
+
+    return fileBtnList;
+  };
 
   const renderClassList = () => {
     if (parsedData == null) {
@@ -18,12 +52,15 @@ export default function DexInfo() {
 
     const results = parsedData.results;
 
-    const classList = [];
+    const fileList = [];
 
     for (let i = 0; i < results.length; i++) {
       //file
       const dexFile = results[i];
-      classList.push(
+
+      fileList.push({ fileName: dexFile.fileName, classList: [] });
+
+      fileList[i].classList.push(
         <DexListItem
           key={String(i)}
           item={{ name: dexFile.fileName, type: "file" }}
@@ -42,7 +79,7 @@ export default function DexInfo() {
           interfaces: data[j].interfaces,
           source: data[j].source_file,
         };
-        classList.push(
+        fileList[i].classList.push(
           <DexListItem key={String(i) + "-" + String(j)} item={item} />
         );
 
@@ -56,7 +93,7 @@ export default function DexInfo() {
             ttype: staticField.field.type,
             access: staticField.access_flags,
           };
-          classList.push(
+          fileList[i].classList.push(
             <DexListItem
               key={String(i) + "-" + String(j) + "-sf-" + String(k)}
               item={item}
@@ -74,7 +111,7 @@ export default function DexInfo() {
             ttype: instanceField.field.type,
             access: instanceField.access_flags,
           };
-          classList.push(
+          fileList[i].classList.push(
             <DexListItem
               key={String(i) + "-" + String(j) + "-if-" + String(k)}
               item={item}
@@ -95,7 +132,7 @@ export default function DexInfo() {
             parameters: directMethod.method.proto.parameters,
             code: directMethod.code.insns,
           };
-          classList.push(
+          fileList[i].classList.push(
             <DexListItem
               key={String(i) + "-" + String(j) + "-df-" + String(k)}
               item={item}
@@ -116,7 +153,7 @@ export default function DexInfo() {
             parameters: virtualMethod.method.proto.parameters,
             code: virtualMethod.code.insns,
           };
-          classList.push(
+          fileList[i].classList.push(
             <DexListItem
               key={String(i) + "-" + String(j) + "-vf-" + String(k)}
               item={item}
@@ -126,24 +163,18 @@ export default function DexInfo() {
       }
     }
 
-    return classList;
+    return fileList;
   };
 
   return (
-    <div class="h-100">
-      {loading.dexInfo_GET_PARSING && (
-        <div class="container">
-          <div class="spinner-border text-primary" role="status"></div>
-        </div>
-      )}
-      <div class="row h-100">
-        <div class="col me-2 bg-light p-3 h-100 rounded border overflow-auto">
-          {renderClassList()}
-        </div>
+    <InfoBox>
+      <div class="row">
+        <ListBox className="col me-2 bg-light p-3 rounded border overflow-auto"></ListBox>
+        {renderedFileBtnList}
         <div class="col m2-2 ">
           <CodeBox />
         </div>
       </div>
-    </div>
+    </InfoBox>
   );
 }

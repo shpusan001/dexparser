@@ -3,6 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { setSelectedMethod } from "../module/dex";
 import { startLoading } from "../module/loading";
 import CodeBoxItem from "./CodeBoxItem";
+import styled from "styled-components";
+
+const ListBox = styled.div`
+  max-height: calc(100vh - 225px); ;
+`;
 
 export default function CodeBox(props) {
   const loading = useSelector((state) => state.loading);
@@ -48,7 +53,9 @@ export default function CodeBox(props) {
 
   return (
     <>
-      <div class="border rounded p-4 bg-light">{renderedCodeList}</div>
+      <ListBox className="border rounded p-4 bg-light overflow-auto">
+        {renderedCodeList}
+      </ListBox>
     </>
   );
 }
