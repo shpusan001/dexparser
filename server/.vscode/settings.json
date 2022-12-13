@@ -1,0 +1,17 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "database": ":memory:",
+      "name": "memory"
+    },
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "progress",
+      "database": "${workspaceFolder:server}/progress.ldb"
+    }
+  ],
+  "sqltools.useNodeRuntime": true
+}

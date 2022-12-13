@@ -325,6 +325,9 @@ result.txt
 work/
 apk/
 dex/
+*.ldb
+*.sql
+*.txt
 
 
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python

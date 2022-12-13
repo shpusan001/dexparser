@@ -1,3 +1,4 @@
+from src.repository.ProgressRepo import ProgressRepo
 from src.util.DexDecompiler import *
 from src.DexCodes import *
 from src.util.LEB128Util import *
@@ -14,6 +15,8 @@ NO_INDEX = 4294967295
 
 class DexPaser:
     def __init__(self) -> None:
+        self.progressRepo = ProgressRepo()
+
         self.path = None
         self.dirpath = None
         self.filepath = None
@@ -697,7 +700,7 @@ class DexPaser:
 
         return classDataItem
 
-    def getClassFull(self):
+    def getClassFull(self, reqKey: str):
         res = list()
 
         stringFull = self.getStringFull()
@@ -742,6 +745,7 @@ class DexPaser:
                 clazzFull["class_data"] = "NOT_EXIST_CLASSDATA"
 
             res.append(clazzFull)
+            self.progressRepo.increaseProgress(reqKey)
 
         fp.close()
 

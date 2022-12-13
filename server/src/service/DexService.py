@@ -1,18 +1,22 @@
 import glob
 import shutil
 import os
+from struct import unpack
 import zipfile
 from pydantic import BaseModel
 from typing import Optional
+from src.dto.ProgressDto import ProgressDto
 from src.util.Singleton import Singleton
 from src.util.DexParser import DexPaser
 from src.util.DexDecompiler import DexDecompiler
 from src.repository.UploadFileMetaRepo import UploadFileMetaRepo
+from src.repository.ProgressRepo import ProgressRepo
 
 
 class DexService(Singleton):
     def __init__(self) -> None:
         self.uploadFileMetaRepo = UploadFileMetaRepo()
+        self.progressRepo = ProgressRepo()
 
         self.SAVE_DIR = "./apk"
         self.WORK_DIR = "./work"
@@ -27,7 +31,7 @@ class DexService(Singleton):
         if not os.path.isdir(self.DEX_DIR):
             os.mkdir("./dex")
 
-    async def parseDex(self, fileId: str) -> dict:
+    async def parseDex(self, fileId: str, reqKey: str) -> dict:
         # apk를 작업 디렉토리로 복사
         shutil.copy(os.path.join(self.SAVE_DIR, fileId+".apk"),
                     os.path.join(self.WORK_DIR, fileId+".apk"))
@@ -56,12 +60,23 @@ class DexService(Singleton):
             shutil.copy(os.path.join(self.WORK_DIR, dex),
                         os.path.join(self.DEX_DIR, dex))
 
+        # 모든 클래스 개수 파악 (프로그래스 바 구현에 사용됨)
+        totalSize = 0
+        for file in os.scandir(self.DEX_DIR):
+            dexParser = DexPaser()
+            dexParser.setFileFullPath(file.path)
+            header = dexParser.getHeader()
+            classDefSize = unpack("<I", header["class_defs_size"])[0]
+            totalSize += classDefSize
+
+        self.progressRepo.addProgress(reqKey, totalSize)
+
         # 모든 덱스 파싱
         parsingResults = list()
         for file in os.scandir(self.DEX_DIR):
             dexParser = DexPaser()
             dexParser.setFileFullPath(file.path)
-            parsingResult = dexParser.getClassFull()
+            parsingResult = dexParser.getClassFull(reqKey=reqKey)
             parsingResults.append(
                 {"fileName": file.name, "data": parsingResult})
 
@@ -72,7 +87,12 @@ class DexService(Singleton):
         self.__deleteAllFiles(self.WORK_DIR)
         self.__deleteAllFiles(self.DEX_DIR)
 
+        self.progressRepo.removeProgress(reqKey)
+
         return res
+
+    async def getProgress(self, reqKey: str) -> ProgressDto:
+        return self.progressRepo.readProgress(reqKey)
 
     class Hex(BaseModel):
         hexcode: str
