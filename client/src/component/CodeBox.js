@@ -6,7 +6,7 @@ import CodeBoxItem from "./CodeBoxItem";
 import styled from "styled-components";
 
 const ListBox = styled.div`
-  max-height: calc(100vh - 225px); ;
+  max-height: calc(100vh - 315px);
 `;
 
 export default function CodeBox(props) {
@@ -53,7 +53,7 @@ export default function CodeBox(props) {
 
   return (
     <>
-      <ListBox className="border rounded p-4 bg-light overflow-auto">
+      <ListBox className="col border rounded p-4 bg-light overflow-auto">
         {renderedCodeList}
       </ListBox>
     </>
