@@ -67,7 +67,7 @@ class DexService(Singleton):
 
         fileName = self.uploadFileMetaRepo.getFileName(fileId)
 
-        res = {"fileName": fileName, "results": parsingResults}
+        res = {"fileName": fileName, "fileId": fileId, "results": parsingResults}
 
         self.__deleteAllFiles(self.WORK_DIR)
         self.__deleteAllFiles(self.DEX_DIR)
