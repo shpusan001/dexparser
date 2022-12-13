@@ -5,3 +5,6 @@ export const getParsing = (data) =>
 
 export const getSmali = (data) =>
   client.post("/conv/hex2smali", data, { withCredentials: true });
+
+export const getProgress = (data) =>
+  client.get("/progress", { params: data }, { withCredentials: true });

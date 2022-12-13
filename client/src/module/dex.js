@@ -12,6 +12,8 @@ const [
   GET_CONV_HEX2SMALI_SUCCESS,
   GET_CONV_HEX2SMALI_FAILURE,
 ] = createRequestActionTypes("dexInfo_GET_CONV_HEX2SMALI");
+const [GET_PROGRESS, GET_PROGRESS_SUCCESS, GET_PROGRESS_FAILURE] =
+  createRequestActionTypes("dexInfo_GET_PROGRESS");
 
 const SET_SELECTED_METHOD = "dexInfo_SET_SELECTED_METHOD";
 
@@ -20,6 +22,8 @@ export const getConvHex2Smali = createAction(
   GET_CONV_HEX2SMALI,
   (data) => data
 );
+export const getProgress = createAction(GET_PROGRESS, (data) => data);
+
 export const setSelectedMethod = createAction(
   SET_SELECTED_METHOD,
   (data) => data
@@ -31,10 +35,12 @@ const getConvHex2SmaliSaga = createRequestSaga(
   GET_CONV_HEX2SMALI,
   dexAPI.getSmali
 );
+const getProgressSaga = createRequestSaga(GET_PROGRESS, dexAPI.getProgress);
 
 export function* dexInfoSaga() {
   yield takeLatest(GET_PARSING, getParsingSaga);
   yield takeLatest(GET_CONV_HEX2SMALI, getConvHex2SmaliSaga);
+  yield takeLatest(GET_PROGRESS, getProgressSaga);
 }
 
 const initialState = {
@@ -42,6 +48,8 @@ const initialState = {
   smali: null,
   selected_method: null,
   error: null,
+  progress: null,
+  progress_error: null,
 };
 
 const dexInfo = handleActions(
@@ -74,6 +82,18 @@ const dexInfo = handleActions(
       return {
         ...state,
         selected_method: data,
+      };
+    },
+    [GET_PROGRESS_SUCCESS]: (state, { payload: data }) => {
+      return {
+        ...state,
+        progress: data,
+      };
+    },
+    [GET_PROGRESS_FAILURE]: (state, { payload: error }) => {
+      return {
+        ...state,
+        progress_error: error,
       };
     },
   },

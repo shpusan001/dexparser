@@ -19,6 +19,7 @@ export const finishLoading = createAction(
 
 const initialState = {
   dexInfo_GET_PARSING: false,
+  dexInfo_GET_PROGRESS: false,
 };
 
 const loading = handleActions(
