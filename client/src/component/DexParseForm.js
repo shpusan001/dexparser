@@ -4,12 +4,15 @@ import { getParsing, getProgress } from "../module/dex";
 import { useSelector } from "react-redux";
 import { ProgressBar } from "react-bootstrap";
 import { getUUIDv4 } from "../util/uuid";
+import { useInterval } from "../util/hooks";
+import { clear } from "@testing-library/user-event/dist/clear";
 
 export default function DexParseForm() {
   const [fileId, setFileId] = useState(null);
   const [nowValue, setNowValue] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
-  // const [reqKey, setReqKey] = useState("");
+  const [reqKey, setReqKey] = useState("");
+  const [intervalId, setIntervalId] = useState(-1);
   const dispatch = useDispatch();
 
   let loading = useSelector((state) => state.loading);
@@ -20,14 +23,33 @@ export default function DexParseForm() {
   };
 
   const onSubmit = (e) => {
-    const reqKey = getUUIDv4();
-    dispatch(getParsing({ fileId: fileId, reqKey: reqKey }));
+    const genReqKey = getUUIDv4();
+    dispatch(getParsing({ fileId: fileId, reqKey: genReqKey }));
+    setReqKey(genReqKey);
     e.preventDefault();
   };
 
-  const dispatchProgress = (reqKey) => {
-    dispatch(getProgress({ reqKey: reqKey }));
+  const dispatchProgress = (flag) => {
+    if (flag == true) {
+      const tmp = setInterval(() => {
+        console.log("hi");
+        dispatch(
+          getProgress({
+            reqKey: reqKey,
+            nowValue: nowValue,
+            maxValue: maxValue,
+          })
+        );
+      }, 1000);
+      setIntervalId(tmp);
+    } else {
+      clearInterval(intervalId);
+    }
   };
+
+  useEffect(() => {
+    dispatchProgress(loading.dexInfo_GET_PARSING);
+  }, [loading.dexInfo_GET_PARSING]);
 
   useEffect(() => {
     if (progress != null) {

@@ -91,8 +91,14 @@ class DexService(Singleton):
 
         return res
 
-    async def getProgress(self, reqKey: str) -> ProgressDto:
-        return self.progressRepo.readProgress(reqKey)
+    async def getProgress(self, reqKey: str, nowValue: int, maxValue: int) -> ProgressDto:
+        currentProgress = self.progressRepo.readProgress(reqKey)
+        if currentProgress != None:
+            return currentProgress
+        else:
+            data = {"nowValue": nowValue, "maxValue": maxValue}
+            progress = ProgressDto(**data)
+            return progress
 
     class Hex(BaseModel):
         hexcode: str

@@ -22,6 +22,10 @@ class ProgressRepo(Singleton):
         cur.execute(
             "SELECT now_value, max_value FROM progress_repo WHERE req_key = ?", (reqKey,))
         data = cur.fetchone()
+
+        if data == None:
+            return None
+
         dto = {
             "nowValue": data[0],
             "maxValue": data[1]
@@ -34,6 +38,9 @@ class ProgressRepo(Singleton):
         cur.execute(
             "SELECT now_value, max_value FROM progress_repo WHERE req_key = ?", (reqKey,))
         data = cur.fetchone()
+
+        if data == None:
+            return None
 
         nowValue = data[0]
 

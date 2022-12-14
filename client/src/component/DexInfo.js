@@ -37,12 +37,8 @@ export default function DexInfo() {
       };
 
       const dexFileBtn = (
-        <span class="col">
-          <button
-            key={String(fileId) + "-btn-" + String(i)}
-            class="btn btn-secondary w-100"
-            onClick={onClick}
-          >
+        <span class="col" key={String(fileId) + "-btn-" + String(i)}>
+          <button class="btn btn-secondary w-100" onClick={onClick}>
             {renderedClassList[i].fileName}
           </button>
         </span>
