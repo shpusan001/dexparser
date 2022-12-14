@@ -1,6 +1,6 @@
-import Header from "../component/Header";
-import DexInfo from "../component/DexInfo";
-import DexParseForm from "../component/DexParseForm";
+import Header from "../component/common/Header";
+import DexInfo from "../component/dex_info/DexInfo";
+import DexParseForm from "../component/dex_info/DexParseForm";
 
 export default function DexInfoPage() {
   return (

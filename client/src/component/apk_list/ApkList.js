@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ApkListItem from "./ApkListItem";
 import { useSelector, useDispatch } from "react-redux";
-import apk, { getApkList } from "../module/apk";
+import apk, { getApkList } from "../../redux/apk";
 
 export default function ApkList(props) {
   const dispatch = useDispatch();

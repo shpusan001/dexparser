@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { getConvHex2Smali, setSelectedMethod } from "../module/dex";
+import { getConvHex2Smali, setSelectedMethod } from "../../redux/dex";
 
 export default function DexListMethodItem(props) {
   const dispatch = useDispatch();

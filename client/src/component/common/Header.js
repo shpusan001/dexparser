@@ -6,7 +6,7 @@ export default function Header() {
       <nav class="navbar bg-dark">
         <div class="container-fluid justify-content-center">
           <h1 class="text-white" href="#">
-            Dexparser
+            Dex parser
           </h1>
         </div>
 

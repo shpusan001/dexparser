@@ -1,8 +1,8 @@
 import { createAction, createActions, handleActions } from "redux-actions";
 import createRequestSaga, {
   createRequestActionTypes,
-} from "../lib/createRequestSaga";
-import * as dexAPI from "../lib/api/dex";
+} from "../util/requestSaga";
+import * as dexAPI from "../util/api/dex";
 import { takeLatest } from "redux-saga/effects";
 
 const [GET_PARSING, GET_PARSING_SUCCESS, GET_PARSING_FAILURE] =

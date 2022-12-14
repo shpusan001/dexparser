@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { deleteApk } from "../module/apk";
+import { deleteApk } from "../../redux/apk";
 
 export default function ApkRemoveForm() {
   const [fileId, setFileId] = useState(null);

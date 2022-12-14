@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function DexListFileItem(props) {
   const [item, setItem] = useState(props.item);
   const [name, setName] = useState(item.name);
-
-  useEffect(() => {}, []);
 
   return (
     <>

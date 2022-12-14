@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setSelectedMethod } from "../module/dex";
-import { startLoading } from "../module/loading";
-import CodeBoxItem from "./CodeBoxItem";
+import CodeListItem from "./CodeListItem";
 import styled from "styled-components";
 
 const ListBox = styled.div`
@@ -10,8 +8,7 @@ const ListBox = styled.div`
   margin-bottom: 15px;
 `;
 
-export default function CodeBox(props) {
-  const loading = useSelector((state) => state.loading);
+export default function CodeList() {
   const smali = useSelector((state) => state.dexInfo.smali);
   const selectedMethod = useSelector((state) => state.dexInfo.selected_method);
 
@@ -42,7 +39,7 @@ export default function CodeBox(props) {
       const method = selectedMethod.method;
 
       return (
-        <CodeBoxItem
+        <CodeListItem
           key={String(clazz) + "-" + String(method) + "-" + String(i)}
           item={item}
         />
@@ -52,11 +49,5 @@ export default function CodeBox(props) {
     return codeList;
   };
 
-  return (
-    <>
-      <ListBox className="col border rounded p-4 bg-light overflow-auto">
-        {renderedCodeList}
-      </ListBox>
-    </>
-  );
+  return <>{renderedCodeList}</>;
 }

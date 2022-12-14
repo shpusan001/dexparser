@@ -1,8 +1,8 @@
 import { createAction, handleActions } from "redux-actions";
 import createRequestSaga, {
   createRequestActionTypes,
-} from "../lib/createRequestSaga";
-import * as apkAPI from "../lib/api/apk";
+} from "../util/requestSaga";
+import * as apkAPI from "../util/api/apk";
 import { takeLatest } from "redux-saga/effects";
 
 const [GET_APKLIST, GET_APKLIST_SUCCESS, GET_APKLIST_FAILURE] =

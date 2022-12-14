@@ -4,11 +4,11 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import App from "./App";
-import { configureStore, applyMiddleware } from "@reduxjs/toolkit";
-import rootReducer from "./module";
+import { configureStore } from "@reduxjs/toolkit";
+import rootReducer from "./redux";
 import { Provider } from "react-redux";
 import createSagaMiddleware from "redux-saga";
-import { rootSaga } from "./module";
+import { rootSaga } from "./redux";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

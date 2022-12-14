@@ -1,7 +1,7 @@
-import Header from "../component/Header";
-import ApkList from "../component/ApkList";
-import ApkUploadForm from "../component/ApkUploadForm";
-import ApkRemoveForm from "../component/ApkRemoveForm";
+import Header from "../component/common/Header";
+import ApkList from "../component/apk_list/ApkList";
+import ApkUploadForm from "../component/apk_list/ApkUploadForm";
+import ApkRemoveForm from "../component/apk_list/ApkRemoveForm";
 import { useEffect, useState } from "react";
 
 export default function ApkListPage() {

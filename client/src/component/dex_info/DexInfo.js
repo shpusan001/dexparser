@@ -1,5 +1,5 @@
-import CodeBox from "../component/CodeBox";
-import DexListItem from "../component/DexListItem";
+import CodeList from "./CodeList";
+import DexListItem from "./DexListItem";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
@@ -109,7 +109,9 @@ export default function DexInfo() {
         <ListBox className="col me-2 bg-light p-3 rounded border overflow-auto">
           {selectedClassList}
         </ListBox>
-        <CodeBox />
+        <ListBox className="col border rounded p-4 bg-light overflow-auto">
+          <CodeList />
+        </ListBox>
       </div>
     </>
   );

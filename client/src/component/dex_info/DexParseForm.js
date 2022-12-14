@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { getParsing, getProgress } from "../module/dex";
+import { getParsing, getProgress } from "../../redux/dex";
 import { useSelector } from "react-redux";
 import { ProgressBar } from "react-bootstrap";
-import { getUUIDv4 } from "../util/uuid";
-import { useInterval } from "../util/hooks";
-import { clear } from "@testing-library/user-event/dist/clear";
+import { getUUIDv4 } from "../../util/uuid";
 
 export default function DexParseForm() {
   const [fileId, setFileId] = useState(null);

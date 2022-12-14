@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { uploadApk } from "../module/apk";
+import { uploadApk } from "../../redux/apk";
 
 export default function ApkUploadForm() {
   const [apkFile, setApkFile] = useState(null);
