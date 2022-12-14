@@ -19,50 +19,53 @@ class DexService(Singleton):
         self.progressRepo = ProgressRepo()
 
         self.SAVE_DIR = "./apk"
-        self.WORK_DIR = "./work"
+        self.UNZIP_DIR = "./unzip"
         self.DEX_DIR = "./dex"
 
         if not os.path.isdir(self.SAVE_DIR):
-            os.mkdir("./apk")
+            if not os.path.isdir(self.SAVE_DIR):
+                os.mkdir(self.SAVE_DIR)
 
-        if not os.path.isdir(self.WORK_DIR):
-            os.mkdir("./work")
+        if not os.path.isdir(self.UNZIP_DIR):
+            if not os.path.isdir(self.UNZIP_DIR):
+                os.mkdir(self.UNZIP_DIR)
 
         if not os.path.isdir(self.DEX_DIR):
-            os.mkdir("./dex")
+            if not os.path.isdir(self.DEX_DIR):
+                os.mkdir(self.DEX_DIR)
 
     async def parseDex(self, fileId: str, reqKey: str) -> dict:
+
+        REQ_UNZIP_DIR = self.UNZIP_DIR+"/"+reqKey
+        REQ_DEX_DIR = self.DEX_DIR+"/"+reqKey
+
+        os.mkdir(REQ_UNZIP_DIR)
+        os.mkdir(REQ_DEX_DIR)
+
         # apk를 작업 디렉토리로 복사
         shutil.copy(os.path.join(self.SAVE_DIR, fileId+".apk"),
-                    os.path.join(self.WORK_DIR, fileId+".apk"))
-        apkFile = zipfile.ZipFile(os.path.join(self.WORK_DIR, fileId+".apk"))
-        apkFile.extractall(os.path.join(self.WORK_DIR))
+                    os.path.join(REQ_UNZIP_DIR, fileId+".apk"))
+        apkFile = zipfile.ZipFile(os.path.join(REQ_UNZIP_DIR, fileId+".apk"))
+        apkFile.extractall(os.path.join(REQ_UNZIP_DIR))
         apkFile.close()
 
-        # 읽기 권한이 없는 폴더 삭제
-        # removeList = ["/r", "/kotlin", "/META-INF", "/lib",
-        #               "/assets", "/res", "okhttp3", "dmaplibres"]
-        # for rm in removeList:
-        #     if os.path.isdir(self.WORK_DIR + rm):
-        #         shutil.rmtree(self.WORK_DIR + rm)
-
         # 디렉토리들 모두 삭제
-        for file in os.scandir(self.WORK_DIR):
+        for file in os.scandir(REQ_UNZIP_DIR):
             if file.is_dir():
                 shutil.rmtree(file.path)
 
         # dex파일만 뽑음
-        fileList = os.listdir(self.WORK_DIR)
+        fileList = os.listdir(REQ_UNZIP_DIR)
         dexList = [file for file in fileList if file.endswith(".dex")]
 
         # dex파일을 작업 디렉토리에서 덱스디렉토리로 복사
         for dex in dexList:
-            shutil.copy(os.path.join(self.WORK_DIR, dex),
-                        os.path.join(self.DEX_DIR, dex))
+            shutil.copy(os.path.join(REQ_UNZIP_DIR, dex),
+                        os.path.join(REQ_DEX_DIR, dex))
 
         # 모든 클래스 개수 파악 (프로그래스 바 구현에 사용됨)
         totalSize = 0
-        for file in os.scandir(self.DEX_DIR):
+        for file in os.scandir(REQ_DEX_DIR):
             dexParser = DexPaser()
             dexParser.setFileFullPath(file.path)
             header = dexParser.getHeader()
@@ -73,7 +76,7 @@ class DexService(Singleton):
 
         # 모든 덱스 파싱
         parsingResults = list()
-        for file in os.scandir(self.DEX_DIR):
+        for file in os.scandir(REQ_DEX_DIR):
             dexParser = DexPaser()
             dexParser.setFileFullPath(file.path)
             parsingResult = dexParser.getClassFull(reqKey=reqKey)
@@ -84,8 +87,8 @@ class DexService(Singleton):
 
         res = {"fileName": fileName, "fileId": fileId, "results": parsingResults}
 
-        self.__deleteAllFiles(self.WORK_DIR)
-        self.__deleteAllFiles(self.DEX_DIR)
+        shutil.rmtree(REQ_UNZIP_DIR)
+        shutil.rmtree(REQ_DEX_DIR)
 
         self.progressRepo.removeProgress(reqKey)
 
@@ -115,3 +118,7 @@ class DexService(Singleton):
         if os.path.exists(filePath):
             for file in os.scandir(filePath):
                 os.remove(file.path)
+
+    def __getCleanDexFileName(self, name: str) -> str:
+        splitPoint = name.rfind("-")
+        return name[splitPoint+1:]

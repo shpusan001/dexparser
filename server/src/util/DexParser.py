@@ -419,14 +419,6 @@ class DexPaser:
         fp. close()
         return res
 
-    # def getAnnotDirItem(self, fp, off:int)->dict:
-
-    #     fp.seek(off)
-
-    #     annotDirItem = dict()
-    #     annotDirItem["class_annotations_off"] = unpack("<I", fp.read(4))[0]
-    #     annotDirItem["access_flags"] = unpack("<I", fp.read(4))[0]
-
     def readStaticFields(self, fp, off: int, size: int, dataPack: dict) -> list:
 
         fp.seek(off)
@@ -749,9 +741,6 @@ class DexPaser:
 
         fp.close()
 
-        # with open("result.txt", "w") as external_file:
-        #     pprint(res, stream=external_file)
-        #     external_file.close()
         return res
 
     def converStringIdxToString(self, stringIdx: int, stringFull: list) -> str:
