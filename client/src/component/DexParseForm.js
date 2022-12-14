@@ -43,6 +43,8 @@ export default function DexParseForm() {
       }, 1000);
       setIntervalId(tmp);
     } else {
+      setNowValue(0);
+      setMaxValue(0);
       clearInterval(intervalId);
     }
   };
@@ -60,9 +62,9 @@ export default function DexParseForm() {
 
   return (
     <>
-      <form class="row row-cols-lg-auto g-8 align-items-center my-3 border p-3 rounded">
-        <div class="col-12">
-          <div class="input-group">
+      <form class="row my-3 border p-3 rounded">
+        <div class="col-10">
+          <div class="input-group ">
             <input
               type="text"
               class="form-control"
@@ -71,19 +73,23 @@ export default function DexParseForm() {
             />
           </div>
         </div>
-        <div class="col-12">
+        <div class="col-2">
           {!loading.dexInfo_GET_PARSING && (
-            <button type="submit" class="btn btn-primary" onClick={onSubmit}>
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              onClick={onSubmit}
+            >
               Parse
             </button>
           )}
           {loading.dexInfo_GET_PARSING && (
-            <div class="container">
+            <div class="container col-2 align-items-center">
               <div class="spinner-border text-primary" role="status"></div>
             </div>
           )}
         </div>
-        <div class="col-12 w-100 mt-4 mb-1">
+        <div class="col w-100 mt-4 mb-1">
           {loading.dexInfo_GET_PARSING && (
             <ProgressBar
               striped

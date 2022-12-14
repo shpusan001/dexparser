@@ -8,10 +8,16 @@ export default function ApkListPage() {
   return (
     <>
       <Header />
-      <div class="container">
-        <ApkUploadForm />
-        <ApkRemoveForm />
-        <ApkList />
+      <div class="container mt-3">
+        <h1>ApkList</h1>
+        <hr />
+        <div class="ms-3">
+          <ApkUploadForm />
+          <hr />
+          <ApkRemoveForm />
+          <hr />
+          <ApkList />
+        </div>
       </div>
     </>
   );

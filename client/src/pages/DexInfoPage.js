@@ -6,9 +6,13 @@ export default function DexInfoPage() {
   return (
     <>
       <Header />
-      <div class="container">
-        <DexParseForm />
-        <DexInfo />
+      <div class="container mt-3">
+        <h1>DexInfo</h1>
+        <hr />
+        <div class="ms-3">
+          <DexParseForm />
+          <DexInfo />
+        </div>
       </div>
     </>
   );

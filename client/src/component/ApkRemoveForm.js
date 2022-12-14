@@ -13,15 +13,16 @@ export default function ApkRemoveForm() {
   const onSubmit = (e) => {
     e.preventDefault();
     new Promise((resolve, reject) => {
-      resolve(dispatch(deleteApk({ fileId: fileId })))
-    }).then(()=>{
-      setFileId("")
-    })
+      resolve(dispatch(deleteApk({ fileId: fileId })));
+    }).then(() => {
+      setFileId("");
+    });
   };
   return (
     <>
-      <form class="row row-cols-lg-auto g-3 align-items-center my-3">
-        <div class="col-12">
+      <h2>File Remove</h2>
+      <form class="row g-3 align-items-center my-3 border rounded p-3">
+        <div class="col-9">
           <div class="input-group">
             <input
               name="fileId"
@@ -33,8 +34,8 @@ export default function ApkRemoveForm() {
             />
           </div>
         </div>
-        <div class="col-12">
-          <button type="submit" class="btn btn-danger" onClick={onSubmit}>
+        <div class="col-3">
+          <button type="submit" class="btn btn-danger w-100" onClick={onSubmit}>
             Remove
           </button>
         </div>

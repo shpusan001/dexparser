@@ -19,8 +19,9 @@ export default function ApkUploadForm() {
 
   return (
     <>
-      <form class="row row-cols-lg-auto g-3 align-items-center my-3">
-        <div class="col-12">
+      <h2>File Upload</h2>
+      <form class="row g-3 align-items-center my-3 border rounded p-3">
+        <div class="col-9">
           <div class="input-group">
             <input
               name="apkFileInput"
@@ -32,8 +33,12 @@ export default function ApkUploadForm() {
             />
           </div>
         </div>
-        <div class="col-12">
-          <button type="submit" class="btn btn-primary" onClick={onSubmit}>
+        <div class="col-3">
+          <button
+            type="submit"
+            class="btn btn-primary w-100"
+            onClick={onSubmit}
+          >
             Upload
           </button>
         </div>
