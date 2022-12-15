@@ -1,4 +1,4 @@
-from src.util.DexParser import *
+from util.Dexparser.DictDexParser import *
 import pprint
 import unittest
 import os
@@ -78,11 +78,11 @@ class TestInit(unittest.TestCase):
 #         res = dexPaser.getMethodFull()
 #         pprint(res)
 
-class DexParserTest_getClassFull(TestInit):
-    def test_runs(self):
-        dexPaser = DexPaser()
-        dexPaser.setFile("./src/res/", "classes.dex")
-        res = dexPaser.getClassFull("11")
+# class DexParserTest_getClassFull(TestInit):
+#     def test_runs(self):
+#         dexPaser = DexPaser()
+#         dexPaser.setFile("./src/res/", "classes.dex")
+#         res = dexPaser.getClassFull("11")
 
 # class DexDecompiler_disassemble(TestInit):
 #     def test_runs(self):

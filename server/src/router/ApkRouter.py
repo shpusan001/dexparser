@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from src.dto.FileManagerServiceDtos import *
 
 from src.service.FileManageService import FileManageService
 
@@ -8,12 +9,12 @@ fileManageService = FileManageService()
 
 
 @router.post("/apk")
-async def uploadApk(res: dict = Depends(fileManageService.uploadApk)):
+async def uploadApk(res: UploadApkRes = Depends(fileManageService.uploadApk)):
     return res
 
 
 @router.delete("/apk")
-async def deleteApk(res: dict = Depends(fileManageService.deleteApk)):
+async def deleteApk(res: DeleteApkRes = Depends(fileManageService.deleteApk)):
     return res
 
 

@@ -30,7 +30,7 @@ class DictFileMetaRepo(FileMetaRepo):
 
         self.__loadUploadFiles()
 
-    def createFileMeta(self, fileId: str, meta: dict) -> bool:
+    def createFileMeta(self, fileId: str, meta: FileMeta) -> bool:
         self.__syncDatabase()
 
         self.uploadFiles[fileId] = meta

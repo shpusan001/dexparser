@@ -7,7 +7,7 @@ from src.dto.FileMetaRepoDtos import FileMeta
 class FileMetaRepo(metaclass=ABCMeta):
 
     @abstractclassmethod
-    def createFileMeta(self, fileId: str, meta: dict) -> bool:
+    def createFileMeta(self, fileId: str, meta: FileMeta) -> bool:
         pass
 
     @abstractclassmethod

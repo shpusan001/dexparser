@@ -1,6 +1,7 @@
 from src.util.Singleton import Singleton
 from src.repository.FileMetaRepo.FileMetaRepo import FileMetaRepo
 from src.repository.FileMetaRepo.DictFileMetaRepo import DictFileMetaRepo
+from src.repository.FileMetaRepo.SQLiteMetaRepo import SQLiteMetaRepo
 from src.repository.ProgressRepo.ProgressRepo import ProgressRepo
 from src.repository.ProgressRepo.SQLiteProgressRepo import SQLiteProgressRepo
 
@@ -13,7 +14,7 @@ class RepoContainer(Singleton):
 
     def getFileMetaRepo(self) -> FileMetaRepo:
         if self.__fileMetaRepo == None:
-            self.__fileMetaRepo = DictFileMetaRepo()
+            self.__fileMetaRepo = SQLiteMetaRepo()
         return self.__fileMetaRepo
 
     def getProgressRepo(self) -> ProgressRepo:

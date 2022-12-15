@@ -96,7 +96,7 @@ class DexService(Singleton):
             parsingResults.append(
                 {"fileName": file.name, "data": parsingResult})
 
-        fileName = self.fileMetaRepo.readFileMeta(fileId)["fileName"]
+        fileName = self.fileMetaRepo.readFileMeta(fileId).fileName
 
         res = {"fileName": fileName, "fileId": fileId, "results": parsingResults}
 
