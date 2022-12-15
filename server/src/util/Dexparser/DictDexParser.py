@@ -1,8 +1,7 @@
-from src.repository.ProgressRepo import ProgressRepo
+from src.container.RepoContainer import RepoContainer
 from src.util.DexDecompiler import *
 from src.DexCodes import *
 from src.util.LEB128Util import *
-import pprint
 from struct import *
 import leb128
 import sys
@@ -13,9 +12,10 @@ sys.path.append('.')
 NO_INDEX = 4294967295
 
 
-class DexPaser:
+class DictDexParser:
     def __init__(self) -> None:
-        self.progressRepo = ProgressRepo()
+        self.progressRepo = RepoContainer().getProgressRepo()
+        self.leb128Util = LEB128Util()
 
         self.path = None
         self.dirpath = None
@@ -33,7 +33,7 @@ class DexPaser:
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
 
-    def setFileFullPath(self, path):
+    def setFileFullPath(self, path: str) -> None:
         self.pathType = "ONE"
         self.path = path
 
@@ -42,7 +42,7 @@ class DexPaser:
         self.dirpath = dirpath
         self.filename = filename
 
-    def getfp(self, mode: str):
+    def __getfp(self, mode: str):
         if self.pathType == "ONE":
             return open(self.path, mode)
         elif self.pathType == "TWO":
@@ -59,35 +59,43 @@ class DexPaser:
 
         # format: (name, readsize)
         headerNames = [
-            ("magic", 8), ("checksum", 4), ("signature", 20), ("file_size", 4),
-            ("header_size", 4), ("endian_tag",
-                                 4), ("link_size", 4), ("link_off", 4),
-            ("map_off", 4), ("string_ids_size",
-                             4), ("string_ids_off", 4), ("type_ids_size", 4),
-            ("type_ids_off", 4), ("proto_ids_size",
-                                  4), ("proto_ids_off", 4), ("field_ids_size", 4),
-            ("field_ids_off", 4), ("method_ids_size",
-                                   4), ("method_ids_off", 4), ("class_defs_size", 4),
-            ("class_defs_off", 4), ("data_size", 4), ("data_off", 4)
+            ("magic", 8, "bytes"), ("checksum", 4, "int"), ("signature",
+                                                            20, "bytes"), ("file_size", 4, "int"),
+            ("header_size", 4, "int"), ("endian_tag",
+                                        4, "int"), ("link_size", 4, "int"), ("link_off", 4, "int"),
+            ("map_off", 4, "int"), ("string_ids_size",
+                                    4, "int"), ("string_ids_off", 4, "int"), ("type_ids_size", 4, "int"),
+            ("type_ids_off", 4, "int"), ("proto_ids_size",
+                                         4, "int"), ("proto_ids_off", 4, "int"), ("field_ids_size", 4, "int"),
+            ("field_ids_off", 4, "int"), ("method_ids_size",
+                                          4, "int"), ("method_ids_off", 4, "int"), ("class_defs_size", 4, "int"),
+            ("class_defs_off", 4, "int"), ("data_size",
+                                           4, "int"), ("data_off", 4, "int")
         ]
         res = dict()
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
         fp.seek(0)
 
         for name in headerNames:
-            res[name[0]] = fp.read(name[1])
+            if name[2] == "bytes":
+                res[name[0]] = fp.read(name[1])
+            elif name[2] == "int":
+                res[name[0]] = unpack("<I", fp.read(name[1]))[0]
 
         fp.close()
         return res
 
+    def getParsedData(self) -> dict:
+        return self.getClassFull()
+
     def getStringIds(self) -> list:
         STRING_ID_ITEM_SIZE = 4
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
         headers = self.getHeader()
-        stringIdsSize = unpack("<I", headers["string_ids_size"])[0]
-        stringIdsOff = unpack("<I", headers["string_ids_off"])[0]
+        stringIdsSize = headers["string_ids_size"]
+        stringIdsOff = headers["string_ids_off"]
         stringIdsOffs = list()
 
         if stringIdsOff == 0:
@@ -110,14 +118,14 @@ class DexPaser:
 
         res = list()
         stringIds = self.getStringIds()
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
 
         for idx in stringIds:
             off = idx["string_data_off"]
 
             fp.seek(off)
             # 스트링의 크기를 나타내는 데이터의 크기
-            LEB128Size = getSizeOfLEB128(fp, off)
+            LEB128Size = self.leb128Util.getSizeOfLEB128(fp, off)
 
             # 스트링의 크기
             stringSize = unpack(str(LEB128Size) + "s", fp.read(LEB128Size))[0]
@@ -143,10 +151,10 @@ class DexPaser:
 
         headers = self.getHeader()
 
-        typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
-        typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
+        typeIdsSize = headers["type_ids_size"]
+        typeIdsOff = headers["type_ids_off"]
 
-        fp = fp = self.getfp('rb')
+        fp = fp = self.__getfp('rb')
 
         if typeIdsOff == 0:
             return res
@@ -177,7 +185,7 @@ class DexPaser:
         typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
         typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
 
-        fp = fp = self.getfp('rb')
+        fp = fp = self.__getfp('rb')
 
         if typeIdsOff == 0:
             return res
@@ -206,13 +214,13 @@ class DexPaser:
 
         res = list()
 
-        protoIdsSize = unpack("<I", headers["proto_ids_size"])[0]
-        protoIdsOff = unpack("<I", headers["proto_ids_off"])[0]
+        protoIdsSize = headers["proto_ids_size"]
+        protoIdsOff = headers["proto_ids_off"]
 
         if protoIdsOff == 0:
             return res
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
 
         fp.seek(protoIdsOff)
 
@@ -270,7 +278,7 @@ class DexPaser:
         typeIds = self.getTypeIds()
         protoIds = self.getProtoIds()
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
 
         for proto in protoIds:
 
@@ -303,13 +311,13 @@ class DexPaser:
 
         res = list()
 
-        fieldIdsSize = unpack("<I", headers["field_ids_size"])[0]
-        fieldIdsOff = unpack("<I", headers["field_ids_off"])[0]
+        fieldIdsSize = headers["field_ids_size"]
+        fieldIdsOff = headers["field_ids_off"]
 
         if fieldIdsOff == 0:
             return res
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
 
         fp.seek(fieldIdsOff)
 
@@ -348,13 +356,13 @@ class DexPaser:
 
         res = list()
 
-        methodIdsSize = unpack("<I", headers["method_ids_size"])[0]
-        methodIdsOff = unpack("<I", headers["method_ids_off"])[0]
+        methodIdsSize = headers["method_ids_size"]
+        methodIdsOff = headers["method_ids_off"]
 
         if methodIdsOff == 0:
             return res
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
 
         fp.seek(methodIdsOff)
 
@@ -394,13 +402,13 @@ class DexPaser:
 
         res = list()
 
-        classDefsSize = unpack("<I", headers["class_defs_size"])[0]
-        classDefsOff = unpack("<I", headers["class_defs_off"])[0]
+        classDefsSize = headers["class_defs_size"]
+        classDefsOff = headers["class_defs_off"]
 
         if classDefsOff == 0:
             return res
 
-        fp = self.getfp('rb')
+        fp = self.__getfp('rb')
 
         fp.seek(classDefsOff)
 
@@ -430,9 +438,11 @@ class DexPaser:
         for _ in range(size):
             encodedField = dict()
 
-            encodedField["field_idx_diff"] = readLEB128ToInt(fp, off)
+            encodedField["field_idx_diff"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
-            encodedField["access_flags"] = readLEB128ToInt(fp, off)
+            encodedField["access_flags"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
 
             res.append(encodedField)
@@ -463,9 +473,11 @@ class DexPaser:
         for _ in range(size):
             encodedField = dict()
 
-            encodedField["field_idx_diff"] = readLEB128ToInt(fp, off)
+            encodedField["field_idx_diff"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
-            encodedField["access_flags"] = readLEB128ToInt(fp, off)
+            encodedField["access_flags"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
 
             res.append(encodedField)
@@ -503,9 +515,9 @@ class DexPaser:
 
         res = dict()
 
-        res["type_idx"] = readLEB128ToInt(fp, off)
+        res["type_idx"] = self.leb128Util.readLEB128ToInt(fp, off)
         off = fp.tell()
-        res["addr"] = readLEB128ToInt(fp, off)
+        res["addr"] = self.leb128Util.readLEB128ToInt(fp, off)
         off = fp.tell()
 
         return res
@@ -516,7 +528,7 @@ class DexPaser:
 
         res = dict()
 
-        res["size"] = readSLEB128ToInt(fp, off)
+        res["size"] = self.leb128Util.readSLEB128ToInt(fp, off)
         off = fp.tell()
 
         tmp = list()
@@ -525,7 +537,7 @@ class DexPaser:
         res["handlers"] = tmp
 
         if res["size"] < 0:
-            res["catch_all_addr"] = readLEB128ToInt(fp, off)
+            res["catch_all_addr"] = self.leb128Util.readLEB128ToInt(fp, off)
             off = fp.tell()
         else:
             res["catch_all_addr"] = "NONE"
@@ -538,7 +550,7 @@ class DexPaser:
 
         res = dict()
 
-        res["size"] = readLEB128ToInt(fp, off)
+        res["size"] = self.leb128Util.readLEB128ToInt(fp, off)
         off = fp.tell()
 
         tmp = list()
@@ -591,11 +603,13 @@ class DexPaser:
         for _ in range(size):
             encodedField = dict()
 
-            encodedField["method_idx_diff"] = readLEB128ToInt(fp, off)
+            encodedField["method_idx_diff"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
-            encodedField["access_flags"] = readLEB128ToInt(fp, off)
+            encodedField["access_flags"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
-            encodedField["code_off"] = readLEB128ToInt(fp, off)
+            encodedField["code_off"] = self.leb128Util.readLEB128ToInt(fp, off)
             off = fp.tell()
             res.append(encodedField)
 
@@ -632,11 +646,13 @@ class DexPaser:
         for _ in range(size):
             encodedField = dict()
 
-            encodedField["method_idx_diff"] = readLEB128ToInt(fp, off)
+            encodedField["method_idx_diff"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
-            encodedField["access_flags"] = readLEB128ToInt(fp, off)
+            encodedField["access_flags"] = self.leb128Util.readLEB128ToInt(
+                fp, off)
             off = fp.tell()
-            encodedField["code_off"] = readLEB128ToInt(fp, off)
+            encodedField["code_off"] = self.leb128Util.readLEB128ToInt(fp, off)
             off = fp.tell()
             res.append(encodedField)
 
@@ -663,19 +679,23 @@ class DexPaser:
 
         return res
 
-    def getClassDataItem(self, fp, off: int, dataPack: dict):
+    def getClassDataItem(self, fp, off: int, dataPack: dict) -> dict:
 
         fp.seek(off)
 
         classDataItem = dict()
 
-        classDataItem["static_fields_size"] = readLEB128ToInt(fp, off)
+        classDataItem["static_fields_size"] = self.leb128Util.readLEB128ToInt(
+            fp, off)
         off = fp.tell()
-        classDataItem["instance_fields_size"] = readLEB128ToInt(fp, off)
+        classDataItem["instance_fields_size"] = self.leb128Util.readLEB128ToInt(
+            fp, off)
         off = fp.tell()
-        classDataItem["direct_methods_size"] = readLEB128ToInt(fp, off)
+        classDataItem["direct_methods_size"] = self.leb128Util.readLEB128ToInt(
+            fp, off)
         off = fp.tell()
-        classDataItem["virtual_methods_size"] = readLEB128ToInt(fp, off)
+        classDataItem["virtual_methods_size"] = self.leb128Util.readLEB128ToInt(
+            fp, off)
         off = fp.tell()
         classDataItem["static_fields"] = self.readStaticFields(
             fp, off, classDataItem["static_fields_size"], dataPack)
@@ -692,7 +712,7 @@ class DexPaser:
 
         return classDataItem
 
-    def getClassFull(self, reqKey: str):
+    def getClassFull(self, reqKey: str) -> dict:
         res = list()
 
         stringFull = self.getStringFull()
@@ -707,7 +727,7 @@ class DexPaser:
         classDataPack["fieldFull"] = fieldFull
         classDataPack["methodFull"] = methodFull
 
-        fp = self.getfp("rb")
+        fp = self.__getfp("rb")
 
         for clazz in classIds:
             clazzFull = dict()
@@ -737,7 +757,7 @@ class DexPaser:
                 clazzFull["class_data"] = "NOT_EXIST_CLASSDATA"
 
             res.append(clazzFull)
-            self.progressRepo.increaseProgress(reqKey)
+            self.progressRepo.updateProgress(reqKey)
 
         fp.close()
 

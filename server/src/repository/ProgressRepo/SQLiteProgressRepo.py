@@ -1,17 +1,31 @@
-from src.util.Singleton import Singleton
+from src.repository.ProgressRepo.ProgressRepo import ProgressRepo
 from src.dto.ProgressDto import ProgressDto
 import sqlite3
+import os
 
 
-class ProgressRepo(Singleton):
+class SQLiteProgressRepo(ProgressRepo):
 
     def __init__(self) -> None:
-        self.con = sqlite3.connect("./progress.ldb")
+        self.WORK_DIR = "./work"
+        self.DB_DIR = self.WORK_DIR + "/db"
+
+        try:
+            if not os.path.isdir(self.WORK_DIR):
+                os.mkdir(self.WORK_DIR)
+
+            if not os.path.isdir(self.DB_DIR):
+                os.mkdir(self.DB_DIR)
+        except:
+            pass
+
+        self.con = sqlite3.connect(
+            self.DB_DIR + "/progress.sqlite")
         cur = self.con.cursor()
         cur.execute(
             "CREATE TABLE IF NOT EXISTS progress_repo(req_key text, now_value integer, max_value integer)")
 
-    def addProgress(self, reqKey: str, maxValue: int) -> None:
+    def createProgress(self, reqKey: str, maxValue: int) -> None:
         con = self.con
         con.execute("INSERT INTO progress_repo VALUES(?, ?, ?)",
                     (reqKey, 0, maxValue))
@@ -32,7 +46,7 @@ class ProgressRepo(Singleton):
         }
         return ProgressDto(**dto)
 
-    def increaseProgress(self, reqKey: str, value: int = 1) -> None:
+    def updateProgress(self, reqKey: str, value: int = 1) -> None:
         cur = self.con.cursor()
         con = self.con
         cur.execute(
@@ -49,7 +63,7 @@ class ProgressRepo(Singleton):
             "UPDATE progress_repo SET now_value = ? WHERE req_key = ?", (updateValue, reqKey))
         con.commit()
 
-    def removeProgress(self, reqKey: str) -> None:
+    def deleteProgress(self, reqKey: str) -> None:
         con = self.con
         con.execute(
             "DELETE FROM progress_repo WHERE req_key = ?", (reqKey,))

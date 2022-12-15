@@ -1,38 +1,41 @@
-import glob
 import shutil
 import os
 from struct import unpack
 import zipfile
 from pydantic import BaseModel
-from typing import Optional
 from src.dto.ProgressDto import ProgressDto
 from src.util.Singleton import Singleton
-from src.util.DexParser import DexPaser
+from src.util.Dexparser.DictDexParser import DictDexParser
 from src.util.DexDecompiler import DexDecompiler
-from src.repository.UploadFileMetaRepo import UploadFileMetaRepo
-from src.repository.ProgressRepo import ProgressRepo
+from src.container.RepoContainer import RepoContainer
 
 
 class DexService(Singleton):
     def __init__(self) -> None:
-        self.uploadFileMetaRepo = UploadFileMetaRepo()
-        self.progressRepo = ProgressRepo()
+        self.fileMetaRepo = RepoContainer().getFileMetaRepo()
+        self.progressRepo = RepoContainer().getProgressRepo()
+        self.dexParser = DictDexParser()
 
-        self.SAVE_DIR = "./apk"
-        self.UNZIP_DIR = "./unzip"
-        self.DEX_DIR = "./dex"
+        self.WORK_DIR = "./work"
 
-        if not os.path.isdir(self.SAVE_DIR):
-            if not os.path.isdir(self.SAVE_DIR):
-                os.mkdir(self.SAVE_DIR)
+        self.APK_DIR = self.WORK_DIR + "/apk"
+        self.UNZIP_DIR = self.WORK_DIR + "/unzip"
+        self.DEX_DIR = self.WORK_DIR + "/dex"
 
-        if not os.path.isdir(self.UNZIP_DIR):
+        try:
+            if not os.path.isdir(self.WORK_DIR):
+                os.mkdir(self.WORK_DIR)
+
+            if not os.path.isdir(self.APK_DIR):
+                os.mkdir(self.APK_DIR)
+
             if not os.path.isdir(self.UNZIP_DIR):
                 os.mkdir(self.UNZIP_DIR)
 
-        if not os.path.isdir(self.DEX_DIR):
             if not os.path.isdir(self.DEX_DIR):
                 os.mkdir(self.DEX_DIR)
+        except:
+            pass
 
     async def parseDex(self, fileId: str, reqKey: str) -> dict:
 
@@ -43,7 +46,7 @@ class DexService(Singleton):
         os.mkdir(REQ_DEX_DIR)
 
         # apk를 작업 디렉토리로 복사
-        shutil.copy(os.path.join(self.SAVE_DIR, fileId+".apk"),
+        shutil.copy(os.path.join(self.APK_DIR, fileId+".apk"),
                     os.path.join(REQ_UNZIP_DIR, fileId+".apk"))
         apkFile = zipfile.ZipFile(os.path.join(REQ_UNZIP_DIR, fileId+".apk"))
         apkFile.extractall(os.path.join(REQ_UNZIP_DIR))
@@ -66,31 +69,29 @@ class DexService(Singleton):
         # 모든 클래스 개수 파악 (프로그래스 바 구현에 사용됨)
         totalSize = 0
         for file in os.scandir(REQ_DEX_DIR):
-            dexParser = DexPaser()
-            dexParser.setFileFullPath(file.path)
-            header = dexParser.getHeader()
-            classDefSize = unpack("<I", header["class_defs_size"])[0]
+            self.dexParser.setFileFullPath(file.path)
+            header = self.dexParser.getHeader()
+            classDefSize = header["class_defs_size"]
             totalSize += classDefSize
 
-        self.progressRepo.addProgress(reqKey, totalSize)
+        self.progressRepo.createProgress(reqKey, totalSize)
 
         # 모든 덱스 파싱
         parsingResults = list()
         for file in os.scandir(REQ_DEX_DIR):
-            dexParser = DexPaser()
-            dexParser.setFileFullPath(file.path)
-            parsingResult = dexParser.getClassFull(reqKey=reqKey)
+            self.dexParser.setFileFullPath(file.path)
+            parsingResult = self.dexParser.getClassFull(reqKey=reqKey)
             parsingResults.append(
                 {"fileName": file.name, "data": parsingResult})
 
-        fileName = self.uploadFileMetaRepo.getFileName(fileId)
+        fileName = self.fileMetaRepo.readFileMeta(fileId)["fileName"]
 
         res = {"fileName": fileName, "fileId": fileId, "results": parsingResults}
 
         shutil.rmtree(REQ_UNZIP_DIR)
         shutil.rmtree(REQ_DEX_DIR)
 
-        self.progressRepo.removeProgress(reqKey)
+        self.progressRepo.deleteProgress(reqKey)
 
         return res
 

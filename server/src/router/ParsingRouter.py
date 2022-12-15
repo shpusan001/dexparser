@@ -1,4 +1,3 @@
-import sys
 from fastapi import APIRouter, Depends
 from src.dto.ProgressDto import ProgressDto
 
