@@ -8,8 +8,8 @@ from src.repository.ProgressRepo.SQLiteProgressRepo import SQLiteProgressRepo
 class RepoContainer(Singleton):
 
     def __init__(self) -> None:
-        self.__fileMetaRepo = None
-        self.__progressRepo = None
+        self.__fileMetaRepo: FileMetaRepo = None
+        self.__progressRepo: ProgressRepo = None
 
     def getFileMetaRepo(self) -> FileMetaRepo:
         if self.__fileMetaRepo == None:

@@ -1,26 +1,29 @@
 import shutil
 import os
-from struct import unpack
 import zipfile
 from pydantic import BaseModel
+from src.repository.FileMetaRepo.FileMetaRepo import FileMetaRepo
+from src.repository.ProgressRepo.ProgressRepo import ProgressRepo
 from src.dto.ProgressDto import ProgressDto
 from src.util.Singleton import Singleton
-from src.util.Dexparser.DictDexParser import DictDexParser
 from src.util.DexDecompiler import DexDecompiler
 from src.container.RepoContainer import RepoContainer
+from src.container.UtilContainer import UtilContainer
+from src.util.DexParser.factory.DexParserFactory import DexParserFactory
+from src.util.DexParser.DexParser import DexParser
 
 
 class DexService(Singleton):
     def __init__(self) -> None:
-        self.fileMetaRepo = RepoContainer().getFileMetaRepo()
-        self.progressRepo = RepoContainer().getProgressRepo()
-        self.dexParser = DictDexParser()
+        self.fileMetaRepo: FileMetaRepo = RepoContainer().getFileMetaRepo()
+        self.progressRepo: ProgressRepo = RepoContainer().getProgressRepo()
+        self.dexParserFactory: DexParserFactory = UtilContainer().getDexParserFactory()
 
-        self.WORK_DIR = "./work"
+        self.WORK_DIR: str = "./work"
 
-        self.APK_DIR = self.WORK_DIR + "/apk"
-        self.UNZIP_DIR = self.WORK_DIR + "/unzip"
-        self.DEX_DIR = self.WORK_DIR + "/dex"
+        self.APK_DIR: str = self.WORK_DIR + "/apk"
+        self.UNZIP_DIR: str = self.WORK_DIR + "/unzip"
+        self.DEX_DIR: str = self.WORK_DIR + "/dex"
 
         try:
             if not os.path.isdir(self.WORK_DIR):
@@ -67,20 +70,29 @@ class DexService(Singleton):
                         os.path.join(REQ_DEX_DIR, dex))
 
         # 모든 클래스 개수 파악 (프로그래스 바 구현에 사용됨)
+        # 모든 프로토(proto) 개수 파악 (프로그래스 바 구현에 사용됨)
         totalSize = 0
         for file in os.scandir(REQ_DEX_DIR):
-            self.dexParser.setFileFullPath(file.path)
-            header = self.dexParser.getHeader()
-            classDefSize = header["class_defs_size"]
+            dexParser: DexParser = self.dexParserFactory.createDexparser()
+            dexParser.setReqKey(reqKey)
+            dexParser.setFileFullPath(file.path)
+            header = dexParser.getHeader()
+
+            classDefSize = header.class_defs_size
+            protoSize = header.proto_ids_size
+
             totalSize += classDefSize
+            totalSize += protoSize
 
         self.progressRepo.createProgress(reqKey, totalSize)
 
         # 모든 덱스 파싱
         parsingResults = list()
         for file in os.scandir(REQ_DEX_DIR):
-            self.dexParser.setFileFullPath(file.path)
-            parsingResult = self.dexParser.getClassFull(reqKey=reqKey)
+            dexParser: DexParser = self.dexParserFactory.createDexparser()
+            dexParser.setReqKey(reqKey)
+            dexParser.setFileFullPath(file.path)
+            parsingResult = dexParser.getClassFull()
             parsingResults.append(
                 {"fileName": file.name, "data": parsingResult})
 

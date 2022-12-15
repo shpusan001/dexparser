@@ -1,7 +1,9 @@
+from src.dto.DexparserDtoes import *
 from src.container.RepoContainer import RepoContainer
 from src.util.DexDecompiler import *
 from src.DexCodes import *
 from src.util.LEB128Util import *
+from src.util.DexParser.DexParser import DexParser
 from struct import *
 import leb128
 import sys
@@ -12,10 +14,12 @@ sys.path.append('.')
 NO_INDEX = 4294967295
 
 
-class DictDexParser:
+class DictDexParser(DexParser):
     def __init__(self) -> None:
         self.progressRepo = RepoContainer().getProgressRepo()
         self.leb128Util = LEB128Util()
+
+        self.reqKey: str = "default"
 
         self.path = None
         self.dirpath = None
@@ -33,6 +37,9 @@ class DictDexParser:
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
 
+    def setReqKey(self, reqKey: str):
+        self.reqKey = reqKey
+
     def setFileFullPath(self, path: str) -> None:
         self.pathType = "ONE"
         self.path = path
@@ -42,7 +49,7 @@ class DictDexParser:
         self.dirpath = dirpath
         self.filename = filename
 
-    def __getfp(self, mode: str):
+    def getfp(self, mode: str):
         if self.pathType == "ONE":
             return open(self.path, mode)
         elif self.pathType == "TWO":
@@ -52,17 +59,17 @@ class DictDexParser:
 
     # 덱스 헤더를 파싱하고 dict로 반환한다
     # 헤더 아이템 정의 : https://source.android.com/docs/core/dalvik/dex-format?hl=ko#header-item
-    def getHeader(self) -> dict:
+    def getHeader(self) -> Header:
 
         if self.header != None:
             return self.header
 
         # format: (name, readsize)
         headerNames = [
-            ("magic", 8, "bytes"), ("checksum", 4, "int"), ("signature",
-                                                            20, "bytes"), ("file_size", 4, "int"),
+            ("magic", 8, "bytes"), ("checksum", 4, "bytes"), ("signature",
+                                                              20, "bytes"), ("file_size", 4, "int"),
             ("header_size", 4, "int"), ("endian_tag",
-                                        4, "int"), ("link_size", 4, "int"), ("link_off", 4, "int"),
+                                        4, "bytes"), ("link_size", 4, "int"), ("link_off", 4, "int"),
             ("map_off", 4, "int"), ("string_ids_size",
                                     4, "int"), ("string_ids_off", 4, "int"), ("type_ids_size", 4, "int"),
             ("type_ids_off", 4, "int"), ("proto_ids_size",
@@ -74,7 +81,7 @@ class DictDexParser:
         ]
         res = dict()
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
         fp.seek(0)
 
         for name in headerNames:
@@ -82,20 +89,22 @@ class DictDexParser:
                 res[name[0]] = fp.read(name[1])
             elif name[2] == "int":
                 res[name[0]] = unpack("<I", fp.read(name[1]))[0]
-
         fp.close()
+
+        res = Header(**res)
+
         return res
 
-    def getParsedData(self) -> dict:
-        return self.getClassFull()
+    def getParsedData(self, reqKey: str) -> dict:
+        return self.getClassFull(reqKey)
 
     def getStringIds(self) -> list:
         STRING_ID_ITEM_SIZE = 4
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
         headers = self.getHeader()
-        stringIdsSize = headers["string_ids_size"]
-        stringIdsOff = headers["string_ids_off"]
+        stringIdsSize = headers.string_ids_size
+        stringIdsOff = headers.string_ids_off
         stringIdsOffs = list()
 
         if stringIdsOff == 0:
@@ -118,7 +127,7 @@ class DictDexParser:
 
         res = list()
         stringIds = self.getStringIds()
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
 
         for idx in stringIds:
             off = idx["string_data_off"]
@@ -151,10 +160,10 @@ class DictDexParser:
 
         headers = self.getHeader()
 
-        typeIdsSize = headers["type_ids_size"]
-        typeIdsOff = headers["type_ids_off"]
+        typeIdsSize = headers.type_ids_size
+        typeIdsOff = headers.type_ids_off
 
-        fp = fp = self.__getfp('rb')
+        fp = fp = self.getfp('rb')
 
         if typeIdsOff == 0:
             return res
@@ -182,10 +191,10 @@ class DictDexParser:
         headers = self.getHeader()
         stringFull = self.getStringFull()
 
-        typeIdsSize = unpack("<I", headers["type_ids_size"])[0]
-        typeIdsOff = unpack("<I", headers["type_ids_off"])[0]
+        typeIdsSize = headers.type_ids_size
+        typeIdsOff = headers.type_ids_off
 
-        fp = fp = self.__getfp('rb')
+        fp = fp = self.getfp('rb')
 
         if typeIdsOff == 0:
             return res
@@ -214,13 +223,13 @@ class DictDexParser:
 
         res = list()
 
-        protoIdsSize = headers["proto_ids_size"]
-        protoIdsOff = headers["proto_ids_off"]
+        protoIdsSize = headers.proto_ids_size
+        protoIdsOff = headers.proto_ids_off
 
         if protoIdsOff == 0:
             return res
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
 
         fp.seek(protoIdsOff)
 
@@ -278,7 +287,7 @@ class DictDexParser:
         typeIds = self.getTypeIds()
         protoIds = self.getProtoIds()
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
 
         for proto in protoIds:
 
@@ -298,6 +307,8 @@ class DictDexParser:
             del proto["return_type_idx"]
             del proto["parameters_off"]
 
+            self.progressRepo.updateProgress(self.reqKey)
+
         res = protoIds
 
         fp.close()
@@ -311,13 +322,13 @@ class DictDexParser:
 
         res = list()
 
-        fieldIdsSize = headers["field_ids_size"]
-        fieldIdsOff = headers["field_ids_off"]
+        fieldIdsSize = headers.field_ids_size
+        fieldIdsOff = headers.field_ids_off
 
         if fieldIdsOff == 0:
             return res
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
 
         fp.seek(fieldIdsOff)
 
@@ -356,13 +367,13 @@ class DictDexParser:
 
         res = list()
 
-        methodIdsSize = headers["method_ids_size"]
-        methodIdsOff = headers["method_ids_off"]
+        methodIdsSize = headers.method_ids_size
+        methodIdsOff = headers.method_ids_off
 
         if methodIdsOff == 0:
             return res
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
 
         fp.seek(methodIdsOff)
 
@@ -402,13 +413,13 @@ class DictDexParser:
 
         res = list()
 
-        classDefsSize = headers["class_defs_size"]
-        classDefsOff = headers["class_defs_off"]
+        classDefsSize = headers.class_defs_size
+        classDefsOff = headers.class_defs_off
 
         if classDefsOff == 0:
             return res
 
-        fp = self.__getfp('rb')
+        fp = self.getfp('rb')
 
         fp.seek(classDefsOff)
 
@@ -712,7 +723,7 @@ class DictDexParser:
 
         return classDataItem
 
-    def getClassFull(self, reqKey: str) -> dict:
+    def getClassFull(self) -> dict:
         res = list()
 
         stringFull = self.getStringFull()
@@ -727,7 +738,7 @@ class DictDexParser:
         classDataPack["fieldFull"] = fieldFull
         classDataPack["methodFull"] = methodFull
 
-        fp = self.__getfp("rb")
+        fp = self.getfp("rb")
 
         for clazz in classIds:
             clazzFull = dict()
@@ -757,7 +768,7 @@ class DictDexParser:
                 clazzFull["class_data"] = "NOT_EXIST_CLASSDATA"
 
             res.append(clazzFull)
-            self.progressRepo.updateProgress(reqKey)
+            self.progressRepo.updateProgress(self.reqKey)
 
         fp.close()
 

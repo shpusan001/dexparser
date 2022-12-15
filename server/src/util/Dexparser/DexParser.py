@@ -1,7 +1,12 @@
 from abc import *
+from src.dto.DexparserDtoes import *
 
 
 class DexParser(metaclass=ABCMeta):
+
+    @abstractclassmethod
+    def setReqKey(self, reqKey: str):
+        pass
 
     @abstractclassmethod
     def setFileFullPath(self, path: str) -> None:
@@ -12,7 +17,7 @@ class DexParser(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def getHeader(self) -> dict:
+    def getHeader(self) -> Header:
         pass
 
     @abstractclassmethod
