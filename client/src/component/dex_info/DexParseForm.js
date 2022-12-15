@@ -11,6 +11,7 @@ export default function DexParseForm() {
   const [maxValue, setMaxValue] = useState(0);
   const [reqKey, setReqKey] = useState("");
   const [intervalId, setIntervalId] = useState(-1);
+  const [pollingPeriod, setPollingPeriod] = useState(200);
   const dispatch = useDispatch();
 
   let loading = useSelector((state) => state.loading);
@@ -30,7 +31,6 @@ export default function DexParseForm() {
   const dispatchProgress = (flag) => {
     if (flag == true) {
       const tmp = setInterval(() => {
-        console.log("hi");
         dispatch(
           getProgress({
             reqKey: reqKey,
@@ -38,7 +38,7 @@ export default function DexParseForm() {
             maxValue: maxValue,
           })
         );
-      }, 1000);
+      }, pollingPeriod);
       setIntervalId(tmp);
     } else {
       setNowValue(0);
