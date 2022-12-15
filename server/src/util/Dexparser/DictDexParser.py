@@ -64,7 +64,7 @@ class DictDexParser(DexParser):
         if self.header != None:
             return self.header
 
-        # format: (name, readsize)
+        # format: (name, readsize, type)
         headerNames = [
             ("magic", 8, "bytes"), ("checksum", 4, "bytes"), ("signature",
                                                               20, "bytes"), ("file_size", 4, "int"),
