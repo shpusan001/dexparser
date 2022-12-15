@@ -1,7 +1,7 @@
 from fastapi import UploadFile
 import uuid
 import os
-
+from src.dto.FileManagerServiceDtos import *
 from src.container.RepoContainer import RepoContainer
 from src.util.Singleton import Singleton
 from src.util.HashDigester import HashDigester
@@ -28,7 +28,7 @@ class FileManageService(Singleton):
         if not os.path.isdir(self.APK_DIR):
             os.mkdir("./apk")
 
-    async def uploadApk(self, file: UploadFile) -> dict:
+    async def uploadApk(self, file: UploadFile) -> UploadApkRes:
 
         fileId = str(uuid.uuid4())
 
@@ -41,22 +41,36 @@ class FileManageService(Singleton):
 
         fileHash = self.hashDigester.sha1ForLageFile(fileWritePath)
 
-        fileMeta = {"fileName": file.filename,
-                    "fileId": fileId, "sha1": fileHash}
+        data = {"fileName": file.filename,
+                "fileId": fileId, "sha1": fileHash}
+        fileMeta = FileMeta(**data)
+
         self.fileMetaRepo.createFileMeta(fileId, fileMeta)
 
-        return {"fileName": filename, "uuid": fileId}
+        resData = {"isError": "false", "error": None, "data": fileMeta}
+        res = UploadApkRes(**resData)
 
-    async def deleteApk(self, fileId: str) -> dict:
+        return res
+
+    async def deleteApk(self, fileId: str) -> DeleteApkRes:
+
+        if self.fileMetaRepo.readFileMeta(fileId) == None:
+            resData = {"isError": "true",
+                       "error": "삭제하려는 파일이 존재하지 않습니다.", "data": None}
+            res = UploadApkRes(**resData)
+            return res
+
+        fileMeta = self.fileMetaRepo.readFileMeta(fileId)
 
         filename = f"{fileId}.apk"
-
-        if not self.fileMetaRepo.deleteFileMeta(fileId):
-            return {"isError": "True", "errorMessage": "삭제하려는 파일이 존재하지 않습니다."}
-
         os.remove(os.path.join(self.APK_DIR, filename))
 
-        return {"fileName": filename, "uuid": fileId, "isError": "False"}
+        resData = {"isError": "false", "error": None, "data": fileMeta}
+        res = UploadApkRes(**resData)
+
+        self.fileMetaRepo.deleteFileMeta(fileId)
+
+        return res
 
     async def getApks(self) -> dict:
         files = self.fileMetaRepo.readFileMetaes()

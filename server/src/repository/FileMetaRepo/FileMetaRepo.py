@@ -1,4 +1,7 @@
 from abc import *
+from typing import List, Optional
+
+from src.dto.FileMetaRepoDtos import FileMeta
 
 
 class FileMetaRepo(metaclass=ABCMeta):
@@ -12,9 +15,9 @@ class FileMetaRepo(metaclass=ABCMeta):
         pass
 
     @abstractclassmethod
-    def readFileMetaes(self) -> list:
+    def readFileMetaes(self) -> List[FileMeta]:
         pass
 
     @abstractclassmethod
-    def readFileMeta(self, fileId: str) -> str:
+    def readFileMeta(self, fileId: str) -> Optional[FileMeta]:
         pass
