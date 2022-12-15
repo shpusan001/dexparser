@@ -1,7 +1,4 @@
-from util.Dexparser.DictDexParser import *
-import pprint
 import unittest
-import os
 import sys
 import time
 sys.path.append('./')

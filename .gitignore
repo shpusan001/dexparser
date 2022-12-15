@@ -328,6 +328,7 @@ dex/
 *.ldb
 *.sql
 *.txt
+!requirements.txt
 
 
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python
