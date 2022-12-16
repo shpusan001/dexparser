@@ -36,7 +36,7 @@ class DictDexParser(DexParser):
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
 
-    def setReqKey(self, reqKey: str):
+    def setReqKey(self, reqKey: str) -> None:
         self.reqKey = reqKey
 
     def setFileFullPath(self, path: str) -> None:
@@ -94,8 +94,8 @@ class DictDexParser(DexParser):
 
         return res
 
-    def getParsedData(self, reqKey: str) -> dict:
-        return self.getClassFull(reqKey)
+    def getParsedData(self) -> dict:
+        return self.getClassFull()
 
     def getStringIds(self) -> list:
         STRING_ID_ITEM_SIZE = 4
@@ -140,7 +140,7 @@ class DictDexParser(DexParser):
             stringSize = leb128.u.decode(stringSize)
 
             res.append({"string_data_full": unpack(
-                str(stringSize)+"s", fp.read(stringSize))[0].decode('latin_1')})
+                str(stringSize)+"s", fp.read(stringSize))[0].decode('mutf-8')})
 
         fp.close()
 

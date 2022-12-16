@@ -38,10 +38,10 @@ class PydanticDexParser(DexParser):
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
 
-    def setReqKey(self, reqKey: str):
+    def setReqKey(self, reqKey: str) -> None:
         self.reqKey = reqKey
 
-    def setFileFullPath(self, path):
+    def setFileFullPath(self, path) -> None:
         self.pathType = "ONE"
         self.path = path
 
@@ -58,8 +58,8 @@ class PydanticDexParser(DexParser):
         else:
             raise Exception("pathType is only ONE or TWO")
 
-    def getParsedData(self, reqKey: str) -> dict:
-        return self.getClassFull(reqKey)
+    def getParsedData(self) -> dict:
+        return self.getClassFull()
 
     # 덱스 헤더를 파싱하고 dict로 반환한다
     # 헤더 아이템 정의 : https://source.android.com/docs/core/dalvik/dex-format?hl=ko#header-item
@@ -612,7 +612,7 @@ class PydanticDexParser(DexParser):
 
         return encodedCatchHandler
 
-    def getEncodedCatchHandlerList(self, fp, off: int) -> dict:
+    def getEncodedCatchHandlerList(self, fp, off: int) -> EncodedCatchHandlerList:
 
         fp.seek(off)
 
@@ -802,7 +802,7 @@ class PydanticDexParser(DexParser):
 
         return classDataItem
 
-    def getClassFull(self):
+    def getClassFull(self) -> dict:
         res = list()
 
         stringFull = self.getStringFull()
