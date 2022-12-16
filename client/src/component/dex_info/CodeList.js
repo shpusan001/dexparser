@@ -34,6 +34,8 @@ export default function CodeList() {
         line: e[0],
         code: e[1],
       };
+      console.log(typeof e[0]);
+      if (typeof e[1] != "string") return <></>;
 
       const clazz = selectedMethod.class;
       const method = selectedMethod.method;
