@@ -2,22 +2,18 @@ import shutil
 import os
 import zipfile
 from pydantic import BaseModel
-from src.repository.FileMetaRepo.FileMetaRepo import FileMetaRepo
-from src.repository.ProgressRepo.ProgressRepo import ProgressRepo
 from src.dto.ProgressDto import ProgressDto
 from src.util.Singleton import Singleton
 from src.util.DexDecompiler import DexDecompiler
 from src.container.RepoContainer import RepoContainer
 from src.container.UtilContainer import UtilContainer
-from src.util.DexParser.factory.DexParserFactory import DexParserFactory
-from src.util.DexParser.DexParser import DexParser
 
 
-class DexService(Singleton):
+class DexService():
     def __init__(self) -> None:
-        self.fileMetaRepo: FileMetaRepo = RepoContainer().getFileMetaRepo()
-        self.progressRepo: ProgressRepo = RepoContainer().getProgressRepo()
-        self.dexParserFactory: DexParserFactory = UtilContainer().getDexParserFactory()
+        self.fileMetaRepo = RepoContainer().getFileMetaRepo()
+        self.progressRepo = RepoContainer().getProgressRepo()
+        self.dexParserFactory = UtilContainer().getDexParserFactory()
 
         self.WORK_DIR: str = "./work"
 
@@ -73,7 +69,7 @@ class DexService(Singleton):
         # 모든 프로토(proto) 개수 파악 (프로그래스 바 구현에 사용됨)
         totalSize = 0
         for file in os.scandir(REQ_DEX_DIR):
-            dexParser: DexParser = self.dexParserFactory.createDexparser()
+            dexParser = self.dexParserFactory.createDexparser()
             dexParser.setReqKey(reqKey)
             dexParser.setFileFullPath(file.path)
             header = dexParser.getHeader()
@@ -89,7 +85,7 @@ class DexService(Singleton):
         # 모든 덱스 파싱
         parsingResults = list()
         for file in os.scandir(REQ_DEX_DIR):
-            dexParser: DexParser = self.dexParserFactory.createDexparser()
+            dexParser = self.dexParserFactory.createDexparser()
             dexParser.setReqKey(reqKey)
             dexParser.setFileFullPath(file.path)
             parsingResult = dexParser.getClassFull()

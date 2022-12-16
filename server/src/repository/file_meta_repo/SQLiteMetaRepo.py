@@ -1,7 +1,7 @@
 from typing import List
 from typing import Optional
 from src.dto.FileMetaRepoDtos import FileMeta
-from src.repository.FileMetaRepo.FileMetaRepo import FileMetaRepo
+from src.repository.file_meta_repo.FileMetaRepo import FileMetaRepo
 import os
 import sqlite3
 

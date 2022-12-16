@@ -1,26 +1,27 @@
 from fastapi import APIRouter, Depends
 from src.dto.ProgressDto import ProgressDto
-
+from src.util.Singleton import Singleton
 
 from src.service.DexService import DexService
 
 
-router = APIRouter()
+class ParsingRouter(Singleton):
 
+    dexService = DexService()
 
-dexService = DexService()
+    def __init__(self) -> None:
+        self.router = APIRouter()
+        self.router.add_api_route("/parsing", self.parse, methods=["GET"])
+        self.router.add_api_route(
+            "/conv/hex2smali", self.hex2smali, methods=["POST"])
+        self.router.add_api_route(
+            "/progress", self.getProgress, methods=["GET"])
 
+    def parse(self, res: dict = Depends(dexService.parseDex)):
+        return res
 
-@router.get("/parsing")
-async def parse(res: dict = Depends(dexService.parseDex)):
-    return res
+    def hex2smali(self, res: dict = Depends(dexService.convertHex2Smali)):
+        return res
 
-
-@router.post("/conv/hex2smali")
-async def hex2smali(res: dict = Depends(dexService.convertHex2Smali)):
-    return res
-
-
-@router.get("/progress")
-async def getProgress(res: ProgressDto = Depends(dexService.getProgress)):
-    return res
+    def getProgress(self, res: ProgressDto = Depends(dexService.getProgress)):
+        return res

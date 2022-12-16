@@ -1,9 +1,9 @@
 from src.dto.DexparserDtoes import *
 from src.container.RepoContainer import RepoContainer
 from src.util.DexDecompiler import *
-from src.DexCodes import *
+from src.util.DexCodes import *
 from src.util.LEB128Util import *
-from src.util.DexParser.DexParser import DexParser
+from src.util.dex_parser.DexParser import DexParser
 from struct import *
 import leb128
 import sys
@@ -17,22 +17,21 @@ NO_INDEX = 4294967295
 class DictDexParser(DexParser):
     def __init__(self) -> None:
         self.progressRepo = RepoContainer().getProgressRepo()
-        self.leb128Util = LEB128Util()
+        self.leb128Util: LEB128Util = LEB128Util()
 
         self.reqKey: str = "default"
 
-        self.path = None
-        self.dirpath = None
-        self.filepath = None
+        self.path: str = None
+        self.dirpath: str = None
 
-        self.pathType = "ONE"  # ONE or TWO
+        self.pathType: str = "ONE"  # ONE or TWO
 
-        self.header = None
-        self.stringFull = None
-        self.typeIds = None
-        self.typeFull = None
-        self.protoIds = None
-        self.protoFull = None
+        self.header: Header = None
+        self.stringFull: list = None
+        self.typeIds: list = None
+        self.typeFull: list = None
+        self.protoIds: list = None
+        self.protoFull: list = None
 
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
@@ -61,7 +60,7 @@ class DictDexParser(DexParser):
     # 헤더 아이템 정의 : https://source.android.com/docs/core/dalvik/dex-format?hl=ko#header-item
     def getHeader(self) -> Header:
 
-        if self.header != None:
+        if self.header is not None:
             return self.header
 
         # format: (name, readsize, type)

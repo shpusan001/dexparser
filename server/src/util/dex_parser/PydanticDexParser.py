@@ -1,5 +1,5 @@
 from src.util.DexDecompiler import *
-from src.DexCodes import *
+from src.util.DexCodes import *
 from src.util.LEB128Util import *
 import pprint
 from struct import *
@@ -7,7 +7,7 @@ import leb128
 import sys
 from src.dto.DexparserDtoes import *
 from typing import List
-from src.util.DexParser.DexParser import DexParser
+from src.util.dex_parser.DexParser import DexParser
 from src.container.RepoContainer import RepoContainer
 
 sys.path.append('.')
@@ -19,22 +19,21 @@ NO_INDEX = 4294967295
 class PydanticDexParser(DexParser):
     def __init__(self) -> None:
         self.progressRepo = RepoContainer().getProgressRepo()
-        self.leb128Util = LEB128Util()
+        self.leb128Util: LEB128Util = LEB128Util()
 
-        self.reqKey = "default"
+        self.reqKey: str = "default"
 
-        self.path = None
-        self.dirpath = None
-        self.filepath = None
+        self.path: str = None
+        self.dirpath: str = None
 
-        self.pathType = "ONE"  # ONE or TWO
+        self.pathType: str = "ONE"  # ONE or TWO
 
         self.header: Header = None
         self.stringFull: List(StringDataFull) = None
         self.typeIds: List[TypeIdx] = None
         self.typeFull: List[TypeIdxFull] = None
-        self.protoIds = None
-        self.protoFull = None
+        self.protoIds: List[ProtoIdx] = None
+        self.protoFull: List[ProtoFull] = None
 
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()

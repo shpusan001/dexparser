@@ -1,23 +1,24 @@
 from fastapi import APIRouter, Depends
 from src.dto.FileManagerServiceDtos import *
-
+from src.util.Singleton import Singleton
 from src.service.FileManageService import FileManageService
 
-router = APIRouter()
 
-fileManageService = FileManageService()
+class ApkRouter(Singleton):
 
+    fileManageService = FileManageService()
 
-@router.post("/apk")
-async def uploadApk(res: UploadApkRes = Depends(fileManageService.uploadApk)):
-    return res
+    def __init__(self) -> None:
+        self.router = APIRouter()
+        self.router.add_api_route("/apk", self.uploadApk, methods=["POST"])
+        self.router.add_api_route("/apk", self.deleteApk, methods=["DELETE"])
+        self.router.add_api_route("/apk", self.getApks, methods=["GET"])
 
+    def uploadApk(self, res: UploadApkRes = Depends(fileManageService.uploadApk)):
+        return res
 
-@router.delete("/apk")
-async def deleteApk(res: DeleteApkRes = Depends(fileManageService.deleteApk)):
-    return res
+    def deleteApk(self, res: DeleteApkRes = Depends(fileManageService.deleteApk)):
+        return res
 
-
-@router.get("/apk")
-async def getApks(res: dict = Depends(fileManageService.getApks)):
-    return res
+    async def getApks(self, res: dict = Depends(fileManageService.getApks)):
+        return res

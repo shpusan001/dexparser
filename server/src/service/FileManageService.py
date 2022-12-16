@@ -7,7 +7,7 @@ from src.util.Singleton import Singleton
 from src.util.HashDigester import HashDigester
 
 
-class FileManageService(Singleton):
+class FileManageService():
 
     def __init__(self) -> None:
         self.fileMetaRepo = RepoContainer().getFileMetaRepo()

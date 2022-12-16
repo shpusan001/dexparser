@@ -1,6 +1,6 @@
-import src.router.ApkRouter as ApkRouter
-import src.router.ParsingRouter as ParsingRouter
-import src.router.DefaultRouter as DefaultRouter
+from src.router.ApkRouter import ApkRouter
+from src.router.ParsingRouter import ParsingRouter
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import sys
@@ -11,9 +11,8 @@ sys.path.append('.')
 
 app = FastAPI()
 
-app.include_router(DefaultRouter.router)
-app.include_router(ParsingRouter.router)
-app.include_router(ApkRouter.router)
+app.include_router(ParsingRouter().router)
+app.include_router(ApkRouter().router)
 
 origins = ["http://localhost:3000",]
 

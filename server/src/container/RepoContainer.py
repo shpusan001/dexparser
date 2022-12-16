@@ -1,9 +1,9 @@
 from src.util.Singleton import Singleton
-from src.repository.FileMetaRepo.FileMetaRepo import FileMetaRepo
-from src.repository.FileMetaRepo.DictFileMetaRepo import DictFileMetaRepo
-from src.repository.FileMetaRepo.SQLiteMetaRepo import SQLiteMetaRepo
-from src.repository.ProgressRepo.ProgressRepo import ProgressRepo
-from src.repository.ProgressRepo.SQLiteProgressRepo import SQLiteProgressRepo
+from src.repository.file_meta_repo.FileMetaRepo import FileMetaRepo
+from src.repository.file_meta_repo.DictFileMetaRepo import DictFileMetaRepo
+from src.repository.file_meta_repo.SQLiteMetaRepo import SQLiteMetaRepo
+from src.repository.progress_repo.ProgressRepo import ProgressRepo
+from src.repository.progress_repo.SQLiteProgressRepo import SQLiteProgressRepo
 
 
 class RepoContainer(Singleton):

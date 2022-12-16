@@ -1,7 +1,7 @@
 from src.util.Singleton import Singleton
-from src.util.DexParser.factory.DexParserFactory import DexParserFactory
-from src.util.DexParser.factory.DictDexParserFactory import DictDexParserFactory
-from src.util.DexParser.factory.PydanticDexParserFactory import PydanticDexParserFactory
+from src.util.dex_parser.factory.DexParserFactory import DexParserFactory
+from src.util.dex_parser.factory.DictDexParserFactory import DictDexParserFactory
+from src.util.dex_parser.factory.PydanticDexParserFactory import PydanticDexParserFactory
 
 
 class UtilContainer(Singleton):

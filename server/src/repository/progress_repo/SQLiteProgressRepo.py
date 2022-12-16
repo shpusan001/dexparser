@@ -1,4 +1,4 @@
-from src.repository.ProgressRepo.ProgressRepo import ProgressRepo
+from src.repository.progress_repo.ProgressRepo import ProgressRepo
 from src.dto.ProgressDto import ProgressDto
 import sqlite3
 import os
