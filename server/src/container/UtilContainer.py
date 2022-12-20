@@ -10,4 +10,4 @@ class UtilContainer(Singleton):
         pass
 
     def getDexParserFactory(self) -> DexParserFactory:
-        return DictDexParserFactory()
+        return PydanticDexParserFactory()

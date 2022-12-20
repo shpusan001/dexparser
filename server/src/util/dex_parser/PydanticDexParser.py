@@ -497,10 +497,11 @@ class PydanticDexParser(DexParser):
             fields.append(encodedField)
 
         tmp = 0
-        for i in range(len(res)):
+        for i in range(len(fields)):
             if i == 0:
                 tmp = fields[i]["field_idx_diff"]
                 fields[i]["field"] = fieldFull[tmp]
+            else:
                 tmp += fields[i]["field_idx_diff"]
                 fields[i]["field"] = fieldFull[tmp]
 
@@ -537,10 +538,11 @@ class PydanticDexParser(DexParser):
             fields.append(encodedField)
 
         tmp = 0
-        for i in range(len(res)):
+        for i in range(len(fields)):
             if i == 0:
                 tmp = fields[i]["field_idx_diff"]
                 fields[i]["field"] = fieldFull[tmp]
+            else:
                 tmp += fields[i]["field_idx_diff"]
                 fields[i]["field"] = fieldFull[tmp]
 

@@ -353,7 +353,7 @@ class DictDexParser(DexParser):
             fieldFull = dict()
             fieldFull["clazz"] = self.convertTypeIdxToString(
                 field["class_idx"], stringFull, typeIds)
-            fieldFull["type"] = self.convertTypeIdxToString(
+            fieldFull["type_full"] = self.convertTypeIdxToString(
                 field["type_idx"], stringFull, typeIds)
             fieldFull["name"] = self.converStringIdxToString(
                 field["name_idx"], stringFull)
