@@ -43,7 +43,7 @@ export default function DexListClassItem(props) {
         type: "field",
         name: staticField.field.name,
         itype: "static",
-        ttype: staticField.field.type,
+        ttype: staticField.field.type_full,
         access: staticField.access_flags,
       };
       tmpClassListItems.push(
@@ -61,7 +61,7 @@ export default function DexListClassItem(props) {
         type: "field",
         name: instanceField.field.name,
         itype: "instance",
-        ttype: instanceField.field.type,
+        ttype: instanceField.field.type_full,
         access: instanceField.access_flags,
       };
       tmpClassListItems.push(
