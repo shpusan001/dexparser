@@ -140,7 +140,7 @@ class DictDexParser(DexParser):
             stringSize = leb128.u.decode(stringSize)
 
             res.append({"string_data_full": unpack(
-                str(stringSize)+"s", fp.read(stringSize))[0].decode('mutf-8')})
+                str(stringSize)+"s", fp.read(stringSize))[0].decode('latin_1')})
 
         fp.close()
 
@@ -351,7 +351,7 @@ class DictDexParser(DexParser):
 
         for field in fieldIds:
             fieldFull = dict()
-            fieldFull["class"] = self.convertTypeIdxToString(
+            fieldFull["clazz"] = self.convertTypeIdxToString(
                 field["class_idx"], stringFull, typeIds)
             fieldFull["type"] = self.convertTypeIdxToString(
                 field["type_idx"], stringFull, typeIds)
@@ -397,7 +397,7 @@ class DictDexParser(DexParser):
 
         for method in methodIds:
             methodFull = dict()
-            methodFull["class"] = self.convertTypeIdxToString(
+            methodFull["clazz"] = self.convertTypeIdxToString(
                 method["class_idx"], stringFull, typeIds)
             methodFull["proto"] = protoFull[method["proto_idx"]]
             methodFull["name"] = self.converStringIdxToString(
@@ -741,7 +741,7 @@ class DictDexParser(DexParser):
 
         for clazz in classIds:
             clazzFull = dict()
-            clazzFull["class"] = self.convertTypeIdxToString(
+            clazzFull["clazz"] = self.convertTypeIdxToString(
                 clazz["class_idx"], stringFull, typeIds)
             clazzFull["access_flags"] = self.convertAccessFlagToString(
                 clazz["access_flags"], ACCESS_FLAG)
