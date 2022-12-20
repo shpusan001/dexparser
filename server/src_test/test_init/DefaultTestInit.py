@@ -1,9 +1,6 @@
 import time
 import unittest
 
-import sys
-sys.path.append('.')
-
 class TestInit(unittest.TestCase):
     def __init__(self, methodName: str = ...) -> None:
         super().__init__(methodName)
