@@ -6,7 +6,7 @@ export default function DexListMethodItem(props) {
   const dispatch = useDispatch();
 
   const [item, setItem] = useState(props.item);
-  const [clazz, setClazz] = useState(item.class);
+  const [clazz, setClazz] = useState(item.clazz);
   const [name, setName] = useState(item.name);
   const [itype, setItype] = useState(item.itype);
   const [rtype, setRtype] = useState(item.rtype);
