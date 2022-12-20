@@ -25,7 +25,7 @@ FastAPI, Sqlite3, Pydantic
 
 사전 설치 필요 소프트웨어   
 ```
-python 3.10 버전 이상, pip 22.3.1버전 이상, node.js v18.12.1 이상
+python 3.10 버전 이상, pip 22.3.1 버전 이상, node.js v18.12.1 이상
 ```
 
 파싱 서버
