@@ -72,14 +72,14 @@ class DictFileMetaRepo(FileMetaRepo):
         self.__syncDatabase()
         return fileMeta
 
-    def __syncDatabase(self):
+    def __syncDatabase(self) -> None:
         self.__saveUploadFiles()
         self.__loadUploadFiles()
 
-    def __saveUploadFiles(self):
+    def __saveUploadFiles(self) -> None:
         with open(self.DB_PATH, 'wb') as fp:
             pickle.dump(self.uploadFiles, fp)
 
-    def __loadUploadFiles(self):
+    def __loadUploadFiles(self) -> None:
         with open(self.DB_PATH, 'rb') as fp:
             self.uploadFiles = pickle.load(fp)

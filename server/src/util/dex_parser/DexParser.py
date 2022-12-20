@@ -5,7 +5,7 @@ from src.dto.DexparserDtoes import *
 class DexParser(metaclass=ABCMeta):
 
     @abstractclassmethod
-    def setReqKey(self, reqKey: str):
+    def setReqKey(self, reqKey: str)->None:
         pass
 
     @abstractclassmethod
