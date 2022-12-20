@@ -77,7 +77,7 @@ export default function DexListClassItem(props) {
       const directMethod = classData.direct_methods[i];
       const item = {
         type: "method",
-        class: directMethod.method.class,
+        class: directMethod.method.clazz,
         name: directMethod.method.name,
         itype: "direct",
         rtype: directMethod.method.proto.return_type,
@@ -98,7 +98,7 @@ export default function DexListClassItem(props) {
       const virtualMethod = classData.virtual_methods[i];
       const item = {
         type: "method",
-        class: virtualMethod.method.class,
+        class: virtualMethod.method.clazz,
         name: virtualMethod.method.name,
         itype: "virtual",
         rtype: virtualMethod.method.proto.return_type,

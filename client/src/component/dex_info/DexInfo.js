@@ -80,7 +80,7 @@ export default function DexInfo() {
         const item = {
           file_id: fileId,
           type: "class",
-          name: data[j].class,
+          name: data[j].clazz,
           superclass: data[j].superclass,
           access: data[j].access_flags,
           interfaces: data[j].interfaces,
