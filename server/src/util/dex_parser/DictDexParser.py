@@ -306,7 +306,8 @@ class DictDexParser(DexParser):
             del proto["return_type_idx"]
             del proto["parameters_off"]
 
-            self.progressRepo.updateProgress(self.reqKey)
+            if self.progressRepo is not None:
+                self.progressRepo.updateProgress(self.reqKey)
 
         res = protoIds
 
@@ -771,7 +772,8 @@ class DictDexParser(DexParser):
                 clazzFull["class_data"] = None
 
             res.append(clazzFull)
-            self.progressRepo.updateProgress(self.reqKey)
+            if self.progressRepo is not None:
+                self.progressRepo.updateProgress(self.reqKey)
 
         fp.close()
 
