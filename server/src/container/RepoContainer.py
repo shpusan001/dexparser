@@ -7,11 +7,12 @@ from src.repository.progress_repo.SQLiteProgressRepo import SQLiteProgressRepo
 
 
 class RepoContainer(Singleton):
+    __fileMetaRepo: FileMetaRepo = None
+    __progressRepo: ProgressRepo = None
 
     def __init__(self) -> None:
-        self.__fileMetaRepo: FileMetaRepo = None
-        self.__progressRepo: ProgressRepo = None
-
+        pass
+    
     def getFileMetaRepo(self) -> FileMetaRepo:
         if self.__fileMetaRepo == None:
             self.__fileMetaRepo = SQLiteMetaRepo()

@@ -5,9 +5,12 @@ from src.util.dex_parser.factory.PydanticDexParserFactory import PydanticDexPars
 
 
 class UtilContainer(Singleton):
+    __dexParserFactory: DexParserFactory = None
 
     def __init__(self) -> None:
         pass
 
     def getDexParserFactory(self) -> DexParserFactory:
-        return DictDexParserFactory()
+        if self.__dexParserFactory == None:
+            self.__dexParserFactory = DictDexParserFactory()
+        return self.__dexParserFactory

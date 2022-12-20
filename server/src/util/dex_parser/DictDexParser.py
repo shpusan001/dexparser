@@ -550,7 +550,7 @@ class DictDexParser(DexParser):
             res["catch_all_addr"] = self.leb128Util.readLEB128ToInt(fp, off)
             off = fp.tell()
         else:
-            res["catch_all_addr"] = "NONE"
+            res["catch_all_addr"] = -1
 
         return res
 
@@ -567,7 +567,7 @@ class DictDexParser(DexParser):
 
         for _ in range(res["size"]):
             tmp.append(self.getEncodedCatchHandler(fp, off))
-        res["list"] = tmp
+        res["handler_list"] = tmp
 
         return res
 
@@ -592,6 +592,8 @@ class DictDexParser(DexParser):
 
         if res["tries_size"] != 0 and res["insns_size"] % 2 == 1:
             res["padding"] = unpack("<H", fp.read(2))[0]
+        else:
+            res["padding"] = None
 
         tmp = list()
         for _ in range(res["tries_size"]):
@@ -599,7 +601,9 @@ class DictDexParser(DexParser):
         res["tries"] = tmp
 
         if res["tries_size"] != 0:
-            res["handler"] = self.getEncodedCatchHandlerList(fp, fp.tell())
+            res["handlers"] = self.getEncodedCatchHandlerList(fp, fp.tell())
+        else:
+            res["handlers"] = None
 
         return res
 
@@ -637,7 +641,7 @@ class DictDexParser(DexParser):
             if res[i]["code_off"] != 0:
                 res[i]["code"] = self.getCodeItem(fp, res[i]["code_off"])
             else:
-                res[i]["code"] = dict()
+                res[i]["code"] = None
 
             del res[i]["method_idx_diff"]
             del res[i]["code_off"]
@@ -680,7 +684,7 @@ class DictDexParser(DexParser):
             if res[i]["code_off"] != 0:
                 res[i]["code"] = self.getCodeItem(fp, res[i]["code_off"])
             else:
-                res[i]["code"] = dict()
+                res[i]["code"] = None
 
             del res[i]["method_idx_diff"]
             del res[i]["code_off"]
@@ -764,7 +768,7 @@ class DictDexParser(DexParser):
                 clazzFull["class_data"] = self.getClassDataItem(
                     fp, clazz["class_data_off"], classDataPack)
             else:
-                clazzFull["class_data"] = "NOT_EXIST_CLASSDATA"
+                clazzFull["class_data"] = None
 
             res.append(clazzFull)
             self.progressRepo.updateProgress(self.reqKey)

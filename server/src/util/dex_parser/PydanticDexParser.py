@@ -662,7 +662,7 @@ class PydanticDexParser(DexParser):
         CodeItemData["tries"] = tmp
 
         if CodeItemData["tries_size"] != 0:
-            CodeItemData["handler"] = self.getEncodedCatchHandlerList(
+            CodeItemData["handlers"] = self.getEncodedCatchHandlerList(
                 fp, fp.tell())
 
         codeItem = CodeItem(**CodeItemData)

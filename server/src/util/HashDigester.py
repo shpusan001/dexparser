@@ -4,7 +4,7 @@ class HashDigester:
     def __init__(self) -> None:
         pass
 
-    def sha1ForLageFile(self, filePath, blockSize=8192):
+    def sha1ForLageFile(self, filePath, blockSize=8192) -> str:
         sha_1 = hashlib.sha1()
         try:
             f = open(filePath, "rb")
