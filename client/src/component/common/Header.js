@@ -21,6 +21,11 @@ export default function Header() {
               DexInfo
             </a>
           </li>
+          <li>
+            <a href="/setting" class="nav-link px-2 text-white">
+              ServerSetting
+            </a>
+          </li>
         </ul>
       </nav>
     </>

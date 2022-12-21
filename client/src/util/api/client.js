@@ -2,11 +2,7 @@ import axios from "axios";
 
 const client = axios.create();
 
-export const BASE_URL = "http://localhost:8000";
-
 axios.defaults.withCredentials = true;
-
-client.defaults.baseURL = BASE_URL;
 
 client.defaults.headers.common["Authorization"] = "temp_key";
 
