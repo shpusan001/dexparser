@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ApkListItem from "./ApkListItem";
 import { useSelector, useDispatch } from "react-redux";
-import apk, { getApkList } from "../../redux/apk";
+import apk, { getApkList, initApkList } from "../../redux/apk";
 
 export default function ApkList(props) {
   const dispatch = useDispatch();
@@ -28,7 +28,6 @@ export default function ApkList(props) {
   };
 
   const renderApkList = () => {
-    console.log(apkList);
     if (apkList != null && apkList != undefined) {
       setFileList(
         apkList.files.map((e, i) => (

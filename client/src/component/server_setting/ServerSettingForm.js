@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import { getApkList, initApkList } from "../../redux/apk";
 import { setMainHost } from "../../redux/setting";
 import client from "../../util/api/client";
 
@@ -14,11 +15,13 @@ export default function ServerSettingForm() {
   const onSubmit = (e) => {
     e.preventDefault();
     dispatch(setMainHost(host));
+    dispatch(initApkList());
+    alert(host + " is host.");
   };
 
   return (
     <>
-      <h2>Server</h2>
+      <h2>Host</h2>
       <form class="row g-3 align-items-center my-3 border rounded p-3">
         <div class="col-9">
           <div class="input-group">

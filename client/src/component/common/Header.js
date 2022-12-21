@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export default function Header() {
@@ -12,19 +13,19 @@ export default function Header() {
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li>
-            <a href="/list" class="nav-link px-2 text-white">
+            <Link to={"/list"} className="nav-link px-2 text-white">
               ApkList
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/dex" class="nav-link px-2 text-white">
+            <Link to={"/dex"} className="nav-link px-2 text-white">
               DexInfo
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/setting" class="nav-link px-2 text-white">
-              ServerSetting
-            </a>
+            <Link to={"/setting"} className="nav-link px-2 text-white">
+              Setting
+            </Link>
           </li>
         </ul>
       </nav>

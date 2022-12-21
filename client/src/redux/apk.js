@@ -5,6 +5,8 @@ import createRequestSaga, {
 import * as apkAPI from "../util/api/apk";
 import { takeLatest } from "redux-saga/effects";
 
+const INIT_APKLIST = "apk_INIT_APK_LIST";
+
 const [GET_APKLIST, GET_APKLIST_SUCCESS, GET_APKLIST_FAILURE] =
   createRequestActionTypes("apk_GET_APKLIST");
 const [UPLOAD_APK, UPLOAD_APK_SUCCESS, UPLOAD_APK_FAILURE] =
@@ -12,6 +14,7 @@ const [UPLOAD_APK, UPLOAD_APK_SUCCESS, UPLOAD_APK_FAILURE] =
 const [DELETE_APK, DELETE_APK_SUCCESS, DELETE_APK_FAILURE] =
   createRequestActionTypes("apk_DELETE_APK");
 
+export const initApkList = createAction(INIT_APKLIST, (data) => data);
 export const getApkList = createAction(GET_APKLIST, (data) => data);
 export const uploadApk = createAction(UPLOAD_APK, (data) => data);
 export const deleteApk = createAction(DELETE_APK, (data) => data);
@@ -36,6 +39,10 @@ const initialState = {
 
 const apk = handleActions(
   {
+    [INIT_APKLIST]: (state, { payload: data }) => ({
+      ...state,
+      apkList: null,
+    }),
     [GET_APKLIST_SUCCESS]: (state, { payload: data }) => ({
       ...state,
       apkList: data,
