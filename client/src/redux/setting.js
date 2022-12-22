@@ -1,4 +1,5 @@
 import { createAction, handleActions } from "redux-actions";
+import { createRequestActionTypes } from "../util/requestSaga";
 
 const SET_HOST = "setting_SET_HOST";
 

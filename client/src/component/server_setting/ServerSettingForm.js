@@ -1,22 +1,35 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { getApkList, initApkList } from "../../redux/apk";
 import { setMainHost } from "../../redux/setting";
-import client from "../../util/api/client";
+import { getSync } from "../../redux/util";
 
 export default function ServerSettingForm() {
-  const [host, setHost] = useState(null);
+  const [inputHost, setInputHost] = useState(null);
   const dispatch = useDispatch();
+  const sync = useSelector((state) => state.util.sync);
+  const host = useSelector((state) => state.setting.host);
+
+  useEffect(() => {
+    if (sync == "sync") {
+      alert(host + " is connected.");
+    } else if (sync == null) {
+      alert(sync + " is disconnected.");
+    }
+  }, [sync]);
+
+  useEffect(() => {
+    dispatch(getSync());
+  }, [host]);
 
   const onChangeHostInput = (e) => {
-    setHost(e.target.value);
+    setInputHost(e.target.value);
   };
 
   const onSubmit = (e) => {
     e.preventDefault();
-    dispatch(setMainHost(host));
+    dispatch(setMainHost(inputHost));
     dispatch(initApkList());
-    alert(host + " is host.");
   };
 
   return (
