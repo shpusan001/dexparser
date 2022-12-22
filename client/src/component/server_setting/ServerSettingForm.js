@@ -44,6 +44,10 @@ export default function ServerSettingForm() {
     <>
       <h2>Host</h2>
       <form class="row g-3 align-items-center my-3 border rounded p-3">
+        <h3>Current Host</h3>
+        <h4 class="text-center text-success bg-light rounded p-2">{host}</h4>
+        <hr />
+        <h3>Host Setting</h3>
         <div class="col-9">
           <div class="input-group">
             <input
