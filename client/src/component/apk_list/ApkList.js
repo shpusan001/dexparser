@@ -29,16 +29,18 @@ export default function ApkList(props) {
 
   const renderApkList = () => {
     if (apkList != null && apkList != undefined) {
-      setFileList(
-        apkList.files.map((e, i) => (
-          <ApkListItem
-            key={i}
-            fileName={e.fileName}
-            fileId={e.fileId}
-            sha1={e.sha1}
-          />
-        ))
-      );
+      if (apkList.files != null) {
+        setFileList(
+          apkList.files.map((e, i) => (
+            <ApkListItem
+              key={i}
+              fileName={e.fileName}
+              fileId={e.fileId}
+              sha1={e.sha1}
+            />
+          ))
+        );
+      }
     }
   };
 
