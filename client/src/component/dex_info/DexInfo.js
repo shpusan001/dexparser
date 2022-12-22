@@ -12,6 +12,8 @@ const ListBox = styled.div`
 export default function DexInfo() {
   let parsedData = useSelector((state) => state.dexInfo.parsing);
   let loading = useSelector((state) => state.loading);
+  let sync = useSelector((state) => state.sync);
+
   const [renderedClassList, setRenderedClassList] = useState(null);
   const [renderedFileBtnList, setRenderedBtnList] = useState(null);
   const [selectedClassList, setSelectedClassList] = useState(<></>);
@@ -51,7 +53,7 @@ export default function DexInfo() {
   };
 
   const renderClassList = () => {
-    if (parsedData == null) {
+    if (parsedData == null || sync == null) {
       return;
     }
 
