@@ -9,17 +9,21 @@ const ListBox = styled.div`
 `;
 
 export default function CodeList() {
+  const [isInit, setIsInit] = useState(true);
   const smali = useSelector((state) => state.dexInfo.smali);
   const selectedMethod = useSelector((state) => state.dexInfo.selected_method);
 
   const [renderedCodeList, setRenderedCodeList] = useState(<></>);
 
   useEffect(() => {
-    new Promise((resolve, reject) => {
-      resolve();
-    }).then(() => {
-      setRenderedCodeList(renderSmaliList());
-    });
+    if (isInit == false) {
+      new Promise((resolve, reject) => {
+        resolve();
+      }).then(() => {
+        setRenderedCodeList(renderSmaliList());
+      });
+    }
+    setIsInit(false);
   }, [smali]);
 
   const renderSmaliList = () => {
@@ -34,7 +38,7 @@ export default function CodeList() {
         line: e[0],
         code: e[1],
       };
-      console.log(typeof e[0]);
+
       if (typeof e[1] != "string") return <></>;
 
       const clazz = selectedMethod.class;
