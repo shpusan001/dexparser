@@ -15,9 +15,9 @@ export default function ServerSettingForm() {
   useEffect(() => {
     if (isInit == false) {
       if (sync == "sync") {
-        alert(host + " is connected.");
+        alert(host + " connection success.");
       } else if (sync == null) {
-        alert(host + " is disconnected.");
+        alert(host + " connection failure.");
       }
     }
     setIsInit(false);
@@ -45,7 +45,12 @@ export default function ServerSettingForm() {
       <h2>Host</h2>
       <form class="row g-3 align-items-center my-3 border rounded p-3">
         <h3>Current Host</h3>
-        <h4 class="text-center text-success bg-light rounded p-2">{host}</h4>
+        {sync == "sync" && (
+          <h4 class="text-center text-success bg-light rounded p-2">{host}</h4>
+        )}
+        {sync == null && (
+          <h4 class="text-center text-danger bg-light rounded p-2">{host}</h4>
+        )}
         <hr />
         <h3>Host Setting</h3>
         <div class="col-9">
