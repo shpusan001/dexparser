@@ -24,17 +24,18 @@ const util = handleActions(
   {
     [GET_SYNC_SUCCESS]: (state, { payload: data }) => ({
       ...state,
-      sync: "data",
+      sync: data.sync,
+      time: data.time,
       error: null,
     }),
-  },
-  {
     [GET_SYNC_FAILURE]: (state, { payload: error }) => ({
       ...state,
       sync: null,
+      time: "",
       error: error,
     }),
   },
+
   initialState
 );
 

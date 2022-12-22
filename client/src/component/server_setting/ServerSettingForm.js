@@ -6,20 +6,27 @@ import { getSync } from "../../redux/util";
 
 export default function ServerSettingForm() {
   const [inputHost, setInputHost] = useState(null);
+  const [isInit, setIsInit] = useState(true);
   const dispatch = useDispatch();
   const sync = useSelector((state) => state.util.sync);
+  const time = useSelector((state) => state.util.time);
   const host = useSelector((state) => state.setting.host);
 
   useEffect(() => {
-    if (sync == "sync") {
-      alert(host + " is connected.");
-    } else if (sync == null) {
-      alert(sync + " is disconnected.");
+    if (isInit == false) {
+      if (sync == "sync") {
+        alert(host + " is connected.");
+      } else if (sync == null) {
+        alert(host + " is disconnected.");
+      }
     }
-  }, [sync]);
+    setIsInit(false);
+  }, [time]);
 
   useEffect(() => {
-    dispatch(getSync());
+    if (isInit == false) {
+      dispatch(getSync());
+    }
   }, [host]);
 
   const onChangeHostInput = (e) => {
@@ -29,6 +36,7 @@ export default function ServerSettingForm() {
   const onSubmit = (e) => {
     e.preventDefault();
     dispatch(setMainHost(inputHost));
+
     dispatch(initApkList());
   };
 
