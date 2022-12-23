@@ -329,6 +329,7 @@ dex/
 *.sql
 *.txt
 !requirements.txt
+!/server/src_test/res/classes.dex
 
 
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python
