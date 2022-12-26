@@ -1,5 +1,6 @@
 import shutil
 import os
+import time
 import zipfile
 from pydantic import BaseModel
 from src.dto.ProgressDto import ProgressDto
@@ -38,11 +39,15 @@ class DexService():
 
     async def parseDex(self, fileId: str, reqKey: str) -> dict:
 
+        startime = time.time()
+
         REQ_UNZIP_DIR = self.UNZIP_DIR+"/"+reqKey
         REQ_DEX_DIR = self.DEX_DIR+"/"+reqKey
 
-        os.mkdir(REQ_UNZIP_DIR)
-        os.mkdir(REQ_DEX_DIR)
+        if not os.path.isdir(REQ_UNZIP_DIR):
+            os.mkdir(REQ_UNZIP_DIR)
+        if not os.path.isdir(REQ_DEX_DIR):
+            os.mkdir(REQ_DEX_DIR)
 
         # apk를 작업 디렉토리로 복사
         shutil.copy(os.path.join(self.APK_DIR, fileId+".apk"),
@@ -100,6 +105,10 @@ class DexService():
         shutil.rmtree(REQ_DEX_DIR)
 
         self.progressRepo.deleteProgress(reqKey)
+
+        endtime = time.time()
+
+        print("Time: ", (endtime-startime))
 
         return res
 
