@@ -12,21 +12,19 @@ export default function ServerSettingForm() {
   const time = useSelector((state) => state.util.time);
   const host = useSelector((state) => state.setting.host);
 
-  useEffect(() => {
-    if (isInit == false) {
-      if (sync == "sync") {
-        alert(host + " connection success.");
-      } else if (sync == null) {
-        alert(host + " connection failure.");
-      }
-    }
-    setIsInit(false);
-  }, [time]);
+  // useEffect(() => {
+  //   if (isInit == false) {
+  //     if (sync == "sync") {
+  //       alert(host + " connection success.");
+  //     } else if (sync == null) {
+  //       alert(host + " connection failure.");
+  //     }
+  //   }
+  //   setIsInit(false);
+  // }, [time]);
 
   useEffect(() => {
-    if (isInit == false) {
-      dispatch(getSync());
-    }
+    dispatch(getSync());
   }, [host]);
 
   const onChangeHostInput = (e) => {
