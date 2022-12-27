@@ -330,6 +330,7 @@ dex/
 *.txt
 !requirements.txt
 !/server/src_test/res/classes.dex
+!/server/src/C/*.so
 
 
 # End of https://www.toptal.com/developers/gitignore/api/react,node,python

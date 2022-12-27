@@ -1,3 +1,4 @@
+from ast import literal_eval
 from src.dto.DexparserDtoes import *
 from src.container.RepoContainer import RepoContainer
 from src.util.DexDecompiler import *
@@ -21,6 +22,8 @@ class ProtoFullStruct(ctypes.Structure):
 
 
 class CDexParser(DexParser):
+    SO_PATH: str = "./src/C/c_dexparser_module.so"
+
     def __init__(self) -> None:
         self.progressRepo = RepoContainer().getProgressRepo()
         self.leb128Util: LEB128Util = LEB128Util()
@@ -38,6 +41,9 @@ class CDexParser(DexParser):
         self.typeFull: list = None
         self.protoIds: list = None
         self.protoFull: list = None
+
+        self.typeIdsArrayInput = None
+        self.stringFullArrayInput = None
 
         self.dexDecompiler = DexDecompiler()
         self.typeListCache = dict()
@@ -262,25 +268,28 @@ class CDexParser(DexParser):
         fp.seek(off)
         return res
 
-    def getTypeListFull(self, fp, off: int) -> list:
+    def getTypeIdsArrayInput(self):
 
-        if off in self.typeListCache:
-            return self.typeListCache[off]
+        if self.typeIdsArrayInput is not None:
+            return self.typeIdsArrayInput
 
         typeIds = self.getTypeIds()
-        stringFull = self.getStringFull()
-
-        fp.seek(off)
-        size = unpack("<I", fp.read(4))[0]
-        fp.seek(off)
-
-        c_dexparser_module = ctypes.cdll.LoadLibrary("./c_dexparser_module.so")
 
         typeIdsArrayProto = ctypes.c_int * (len(typeIds))
 
         typeIdsArrayInput = typeIdsArrayProto()
         for i in range(len(typeIds)):
             typeIdsArrayInput[i] = typeIds[i]["descriptor_idx"]
+
+        self.typeIdsArrayInput = typeIdsArrayInput
+        return typeIdsArrayInput
+
+    def getStringFullArrayInput(self):
+
+        if self.stringFullArrayInput is not None:
+            return self.stringFullArrayInput
+
+        stringFull = self.getStringFull()
 
         stringFullArrayProto = ctypes.c_wchar_p*(len(stringFull)+1)
 
@@ -289,53 +298,44 @@ class CDexParser(DexParser):
             stringFullArrayInput[i] = stringFull[i]["string_data_full"]
         stringFullArrayInput[len(stringFull)] = None
 
-        c_dexparser_module.getTypeListFull.argtypes = (
+        self.stringFullArrayInput = stringFullArrayInput
+        return stringFullArrayInput
+
+    def getTypeListFull(self, fp, off: int) -> list:
+
+        if off in self.typeListCache:
+            return self.typeListCache[off]
+
+        fp.seek(off)
+
+        c_dexparser_module = ctypes.cdll.LoadLibrary(self.SO_PATH)
+
+        c_dexparser_module.getTypeListFullStr.argtypes = (
             ctypes.c_wchar_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(
                 ctypes.c_wchar_p))
 
-        c_dexparser_module.getTypeListFull.restype = ctypes.POINTER(
-            ctypes.c_wchar_p*size)
+        c_dexparser_module.getTypeListFullStr.restype = ctypes.c_wchar_p
 
-        typeListFullPtr = c_dexparser_module.getTypeListFull(
-            self.path, off, typeIdsArrayInput, stringFullArrayInput)
+        typeListFullStr = c_dexparser_module.getTypeListFullStr(
+            self.path, off, self.getTypeIdsArrayInput(), self.getStringFullArrayInput())
 
-        typeListFull = [x for x in typeListFullPtr.contents]
+        typeListFull = eval(typeListFullStr)
 
         self.typeListCache[off] = typeListFull
 
         return typeListFull
 
-    class ProtoFullStruct(ctypes.Structure):
-        _fields_ = [("shorty", ctypes.c_wchar_p), ("return_type",
-                                                   ctypes.c_wchar_p), ("parameter", ctypes.POINTER(ctypes.c_wchar_p))]
-
     def getProtoFull(self) -> list:
 
-        if self.protoIds != None:
-            return self.protoIds
-
-        stringFull = self.getStringFull()
-        typeIds = self.getTypeIds()
+        if self.protoFull != None:
+            return self.protoFull
 
         headers = self.getHeader()
 
         size = headers.proto_ids_size
         off = headers.proto_ids_off
 
-        c_dexparser_module = ctypes.cdll.LoadLibrary("./c_dexparser_module.so")
-
-        typeIdsArrayProto = ctypes.c_int * (len(typeIds))
-
-        typeIdsArrayInput = typeIdsArrayProto()
-        for i in range(len(typeIds)):
-            typeIdsArrayInput[i] = typeIds[i]["descriptor_idx"]
-
-        stringFullArrayProto = ctypes.c_wchar_p*(len(stringFull)+1)
-
-        stringFullArrayInput = stringFullArrayProto()
-        for i in range(len(stringFull)):
-            stringFullArrayInput[i] = stringFull[i]["string_data_full"]
-        stringFullArrayInput[len(stringFull)] = None
+        c_dexparser_module = ctypes.cdll.LoadLibrary(self.SO_PATH)
 
         c_dexparser_module.getProtoFull.argtypes = (
             ctypes.c_wchar_p, ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(
@@ -344,9 +344,12 @@ class CDexParser(DexParser):
         c_dexparser_module.getProtoFull.restype = ctypes.c_wchar_p
 
         protoFullString = c_dexparser_module.getProtoFull(
-            self.path, size, off, typeIdsArrayInput, stringFullArrayInput)
+            self.path, size, off, self.getTypeIdsArrayInput(), self.getStringFullArrayInput())
 
-        return eval(protoFullString)
+        protoFull = literal_eval(protoFullString)
+
+        self.protoFull = protoFull
+        return protoFull
 
     def getFieldIds(self) -> list:
         headers = self.getHeader()

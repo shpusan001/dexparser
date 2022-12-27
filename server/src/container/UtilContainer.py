@@ -13,5 +13,5 @@ class UtilContainer(Singleton):
 
     def getDexParserFactory(self) -> DexParserFactory:
         if self.__dexParserFactory == None:
-            self.__dexParserFactory = CDexParserFactory()
+            self.__dexParserFactory = DictDexParserFactory()
         return self.__dexParserFactory
