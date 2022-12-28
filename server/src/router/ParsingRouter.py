@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
 from src.dto.ProgressDto import ProgressDto
-from src.util.Singleton import Singleton
 
 from src.service.DexService import DexService
 
 
-class ParsingRouter(Singleton):
+class ParsingRouter():
 
     dexService = DexService()
 

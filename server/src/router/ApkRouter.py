@@ -1,10 +1,9 @@
 from fastapi import APIRouter, Depends
-from src.dto.FileManagerServiceDtos import *
-from src.util.Singleton import Singleton
+from src.dto.FileManagerServiceDtoes import *
 from src.service.FileManageService import FileManageService
 
 
-class ApkRouter(Singleton):
+class ApkRouter():
 
     fileManageService = FileManageService()
 

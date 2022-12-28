@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends
-from src.dto.FileManagerServiceDtos import *
-from src.util.Singleton import Singleton
+from fastapi import APIRouter
+from src.dto.FileManagerServiceDtoes import *
 import time
 
 
-class UtilRouter(Singleton):
+class UtilRouter():
 
     def __init__(self) -> None:
         self.router = APIRouter()

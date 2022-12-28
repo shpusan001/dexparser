@@ -4,7 +4,6 @@ import time
 import zipfile
 from pydantic import BaseModel
 from src.dto.ProgressDto import ProgressDto
-from src.util.Singleton import Singleton
 from src.util.DexDecompiler import DexDecompiler
 from src.container.RepoContainer import RepoContainer
 from src.container.UtilContainer import UtilContainer

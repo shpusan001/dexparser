@@ -1,8 +1,3 @@
-import os
-import sys
-from optparse import OptionParser
-from pprint import pprint
-
 from construct import *
 
 

@@ -1,9 +1,8 @@
 from fastapi import UploadFile
 import uuid
 import os
-from src.dto.FileManagerServiceDtos import *
+from src.dto.FileManagerServiceDtoes import *
 from src.container.RepoContainer import RepoContainer
-from src.util.Singleton import Singleton
 from src.util.HashDigester import HashDigester
 
 

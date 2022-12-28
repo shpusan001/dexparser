@@ -16,11 +16,6 @@ sys.path.append('.')
 NO_INDEX = 4294967295
 
 
-class ProtoFullStruct(ctypes.Structure):
-    _fields_ = [("shorty", ctypes.c_wchar_p), ("return_typ",
-                                               ctypes.c_wchar_p), ("parameter", ctypes.POINTER(ctypes.c_wchar_p))]
-
-
 class CDexParser(DexParser):
     SO_PATH: str = "./src/C/c_dexparser_module.so"
 
