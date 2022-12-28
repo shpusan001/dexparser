@@ -40,14 +40,14 @@ export default function Header() {
             </li>
           </ul>
 
-          <div class=" form-check form-switch">
+          {/* <div class=" form-check form-switch">
             <input
               class="form-check-input input-group-lg"
               type="checkbox"
               role="switch"
               id="flexSwitchCheckDefault"
             />
-          </div>
+          </div> */}
         </div>
       </nav>
     </>
