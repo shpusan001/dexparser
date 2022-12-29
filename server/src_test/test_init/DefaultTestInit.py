@@ -1,6 +1,7 @@
 import time
 import unittest
 
+
 class TestInit(unittest.TestCase):
     def __init__(self, methodName: str = ...) -> None:
         super().__init__(methodName)
@@ -8,6 +9,7 @@ class TestInit(unittest.TestCase):
         self.etime = 0
 
     def setUp(self) -> None:
+        print(self.__module__)
         print("MethodName:", self._testMethodName)
         self.stime = time.time()
         return super().setUp()
@@ -17,4 +19,3 @@ class TestInit(unittest.TestCase):
         print("Time:", self.etime - self.stime)
         print()
         return super().tearDown()
-        
