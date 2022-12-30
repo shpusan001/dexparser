@@ -15,7 +15,7 @@ app.include_router(ParsingRouter().router)
 app.include_router(ApkRouter().router)
 app.include_router(UtilRouter().router)
 
-origins = ["http://localhost:3000",]
+origins = ["*",]
 
 app.add_middleware(
     CORSMiddleware,
