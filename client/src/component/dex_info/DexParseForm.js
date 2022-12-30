@@ -11,7 +11,7 @@ export default function DexParseForm() {
   const [maxValue, setMaxValue] = useState(0);
   const [reqKey, setReqKey] = useState("");
   const [intervalId, setIntervalId] = useState(-1);
-  const [pollingPeriod, setPollingPeriod] = useState(200);
+  const [pollingPeriod, setPollingPeriod] = useState(800);
   const dispatch = useDispatch();
 
   let loading = useSelector((state) => state.loading);
