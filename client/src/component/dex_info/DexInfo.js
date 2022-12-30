@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const ListBox = styled.div`
-  max-height: calc(100vh - 315px);
+  max-height: calc(100vh - 30px);
   margin-bottom: 15px;
 `;
 

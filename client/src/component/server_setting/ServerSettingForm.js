@@ -51,7 +51,7 @@ export default function ServerSettingForm() {
         )}
         <hr />
         <h3>Host Setting</h3>
-        <div class="col-9">
+        <div class="col-12">
           <div class="input-group">
             <input
               name="hostInput"
@@ -62,7 +62,7 @@ export default function ServerSettingForm() {
             />
           </div>
         </div>
-        <div class="col-3">
+        <div class="col-12">
           <button
             type="submit"
             class="btn btn-primary w-100"

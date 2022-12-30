@@ -22,7 +22,7 @@ export default function ApkRemoveForm() {
     <>
       <h2>File Remove</h2>
       <form class="row g-3 align-items-center my-3 border rounded p-3">
-        <div class="col-9">
+        <div class="col-12">
           <div class="input-group">
             <input
               name="fileId"
@@ -34,7 +34,7 @@ export default function ApkRemoveForm() {
             />
           </div>
         </div>
-        <div class="col-3">
+        <div class="col-12">
           <button type="submit" class="btn btn-danger w-100" onClick={onSubmit}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

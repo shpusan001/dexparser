@@ -45,10 +45,10 @@ export default function ApkList(props) {
   };
 
   return (
-    <>
+    <div class="pb-3">
       <h2 class="justify-content-center">APK List</h2>
       {/* <div onClick={refresh}>새로고침</div> */}
       <div class="rounded border p-4 mt-3">{fileList}</div>
-    </>
+    </div>
   );
 }

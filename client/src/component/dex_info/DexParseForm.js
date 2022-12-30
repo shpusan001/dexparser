@@ -61,7 +61,7 @@ export default function DexParseForm() {
   return (
     <>
       <form class="row my-3 border p-3 rounded">
-        <div class="col-10">
+        <div class="col-12 mb-3">
           <div class="input-group ">
             <input
               type="text"
@@ -71,7 +71,7 @@ export default function DexParseForm() {
             />
           </div>
         </div>
-        <div class="col-2">
+        <div class="col-12">
           {!loading.dexInfo_GET_PARSING && (
             <button
               type="submit"

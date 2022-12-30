@@ -20,8 +20,8 @@ export default function ApkUploadForm() {
   return (
     <>
       <h2>File Upload</h2>
-      <form class="row g-3 align-items-center my-3 border rounded p-3">
-        <div class="col-9">
+      <form class="row g-3 align-items-center my-3 border rounded p-3 ">
+        <div class="col-12 ">
           <div class="input-group">
             <input
               name="apkFileInput"
@@ -33,11 +33,12 @@ export default function ApkUploadForm() {
             />
           </div>
         </div>
-        <div class="col-3">
+        <div class="col-12">
           <button
             type="submit"
-            class="btn btn-primary w-100"
+            class="btn btn-primary w-100 "
             onClick={onSubmit}
+            q
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
