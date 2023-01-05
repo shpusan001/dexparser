@@ -67,18 +67,18 @@ npm start
 
 ---
 
-### 4.스크린샷
+### 5.스크린샷
 
-#### 3-1 Apk파일 업로드 및 리스트 확인
+#### 5-1 파싱 서버에 연결
+<img width="1720" alt="image" src="https://user-images.githubusercontent.com/35298140/210758487-0114d082-622f-4aa3-bb29-56db7a0c73e9.png">
 
-<img width="1503" alt="apklist" src="https://user-images.githubusercontent.com/35298140/208599122-030dd1e8-227f-4369-9528-29cfa26d859b.png">
+#### 5-2 APK 파일 리스트 확인
+<img width="1726" alt="image" src="https://user-images.githubusercontent.com/35298140/210758548-0e2c254c-9ff7-425f-a3d8-de526b2df1a4.png">
 
-#### 3-2 DexInfo 페이지에서 파일의 아이디를 넣고 Parse버튼 클릭
+#### 5-3 파싱 요청
+<img width="1726" alt="image" src="https://user-images.githubusercontent.com/35298140/210758646-7ea278ca-a717-4ab9-b9eb-310d38a36460.png">
 
-<img width="1502" alt="dexinfo_loading" src="https://user-images.githubusercontent.com/35298140/208599126-de73e938-e905-4a14-a255-8197b81f8174.png">
-
-#### 3-3 DexInfo 페이지에서 파싱 결과 확인
-
-<img width="1491" alt="dexinfo_parsed_result" src="https://user-images.githubusercontent.com/35298140/208599132-bc58ae7f-0574-4d36-b312-06dda0c1a09e.png">
+#### 5-4 파싱 결과 출력
+<img width="1724" alt="image" src="https://user-images.githubusercontent.com/35298140/210758705-37a857e7-00c0-4769-8a82-8754e471d7fe.png">
 
 ---
